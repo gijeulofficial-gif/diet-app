@@ -1,0 +1,3888 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>71키로의 여정</title>
+  <link rel="manifest" href="/diet/manifest.json" />
+  <meta name="theme-color" content="#E85D3A" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    :root {
+      --bg: #FAFAFA;
+      --bg-deep: #F0F0F0;
+      --card: #FFFFFF;
+      --text: #333333;
+      --text-inv: #FFFFFF;
+      --sub: #888888;
+      --sub2: #AAAAAA;
+      --border: rgba(0,0,0,0.08);
+      --primary: #E85D3A;
+      --primary-bg: rgba(232,93,58,0.1);
+      --primary-bg2: rgba(232,93,58,0.15);
+      --success: #4CAF50;
+      --success-bg: rgba(76,175,80,0.12);
+      --energy: #FF8C42;
+      --energy-bg: rgba(255,140,66,0.12);
+      --diet-green: #66BB6A;
+      --diet-green-bg: rgba(102,187,106,0.12);
+      --settings-gray: #78909C;
+      --danger: #f44336;
+      --danger-bg: rgba(244,67,54,0.1);
+      --blue: #2196F3;
+      --blue-bg: rgba(33,150,243,0.1);
+      --gold: #FFD700;
+      --gold-bg: rgba(255,215,0,0.12);
+      --nav-bg: rgba(255,255,255,0.92);
+      --nav-border: rgba(0,0,0,0.06);
+      --shadow: 0 2px 12px rgba(0,0,0,0.06);
+      --shadow-lg: 0 4px 20px rgba(0,0,0,0.1);
+      --input-bg: #F5F5F5;
+      --input-border: rgba(0,0,0,0.1);
+      --overlay: rgba(0,0,0,0.5);
+      --check-unchecked: #CCCCCC;
+    }
+    [data-theme="dark"] {
+      --bg: #1A1A2E;
+      --bg-deep: #0f0f1a;
+      --card: #16213E;
+      --text: #EEEEEE;
+      --text-inv: #FFFFFF;
+      --sub: #AAAAAA;
+      --sub2: #666666;
+      --border: rgba(255,255,255,0.06);
+      --primary: #E85D3A;
+      --primary-bg: rgba(232,93,58,0.15);
+      --primary-bg2: rgba(232,93,58,0.2);
+      --success: #4CAF50;
+      --success-bg: rgba(76,175,80,0.15);
+      --energy: #FF8C42;
+      --energy-bg: rgba(255,140,66,0.15);
+      --diet-green: #66BB6A;
+      --diet-green-bg: rgba(102,187,106,0.15);
+      --settings-gray: #78909C;
+      --danger: #f44336;
+      --danger-bg: rgba(244,67,54,0.15);
+      --blue: #2196F3;
+      --blue-bg: rgba(33,150,243,0.15);
+      --gold: #FFD700;
+      --gold-bg: rgba(255,215,0,0.15);
+      --nav-bg: rgba(15,15,35,0.92);
+      --nav-border: rgba(255,255,255,0.06);
+      --shadow: none;
+      --shadow-lg: none;
+      --input-bg: #1a1a2e;
+      --input-border: rgba(255,255,255,0.1);
+      --overlay: rgba(0,0,0,0.7);
+      --check-unchecked: #444444;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-deep);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      min-height: 100dvh;
+    }
+    #root {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100dvh;
+      background: var(--bg);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .header {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .header-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .header-date {
+      font-size: 13px;
+      color: var(--sub);
+    }
+
+    /* Content */
+    .content {
+      flex: 1;
+      padding: 20px;
+      padding-bottom: 80px;
+      overflow-y: auto;
+    }
+
+    /* Home */
+    .day-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary-bg);
+      color: var(--primary);
+      font-size: 18px;
+      font-weight: 700;
+      padding: 10px 20px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+    }
+    .day-badge .dot {
+      width: 10px; height: 10px;
+      background: var(--primary);
+      border-radius: 50%;
+    }
+
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .timeline-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+      border-left: 3px solid var(--primary);
+      box-shadow: var(--shadow);
+      transition: transform 0.2s;
+    }
+    .timeline-card:active {
+      transform: scale(0.98);
+    }
+    .timeline-label {
+      font-size: 13px;
+      color: var(--primary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .timeline-empty {
+      font-size: 14px;
+      color: var(--sub2);
+    }
+    .timeline-card.day-b {
+      border-left-color: var(--energy);
+    }
+    .timeline-card.day-b .timeline-label {
+      color: var(--energy);
+    }
+    .timeline-time {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--sub);
+      margin-bottom: 14px;
+    }
+
+    /* Checklist */
+    .checklist {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      padding: 8px 10px;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    .check-item.checked {
+      background: var(--success-bg);
+    }
+    .check-item.checked .check-text {
+      text-decoration: line-through;
+      color: var(--sub2);
+    }
+    .check-box {
+      width: 20px;
+      height: 20px;
+      min-width: 20px;
+      border-radius: 5px;
+      border: 2px solid var(--check-unchecked);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+      transition: all 0.2s;
+    }
+    .check-item.checked .check-box {
+      border-color: var(--success);
+      background: var(--success);
+    }
+    .check-box svg {
+      width: 12px;
+      height: 12px;
+      fill: var(--text-inv);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .check-item.checked .check-box svg {
+      opacity: 1;
+    }
+    .check-text {
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.5;
+      transition: all 0.2s;
+    }
+    .check-sub {
+      font-size: 12px;
+      color: var(--sub2);
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+
+    /* Progress */
+    .card-progress {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .progress-bar {
+      flex: 1;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+    .progress-fill.green { background: var(--primary); }
+    .progress-fill.blue { background: var(--energy); }
+    .progress-text {
+      font-size: 12px;
+      color: var(--sub);
+      white-space: nowrap;
+    }
+
+    /* Accordion */
+    .accordion {
+      margin-top: 6px;
+      margin-left: 40px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .accordion-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--blue-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.2s;
+    }
+    .accordion-header:hover {
+      background: var(--blue-bg);
+    }
+    .accordion-header.open {
+      border-radius: 10px 10px 0 0;
+    }
+    .accordion-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--blue);
+    }
+    .accordion-meta {
+      font-size: 11px;
+      color: var(--sub2);
+    }
+    .accordion-arrow {
+      font-size: 12px;
+      color: var(--blue);
+      transition: transform 0.25s ease;
+    }
+    .accordion-arrow.open {
+      transform: rotate(180deg);
+    }
+    .accordion-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 10px 10px;
+    }
+    .accordion-body.open {
+      max-height: 800px;
+    }
+    .accordion-content {
+      padding: 12px 14px;
+    }
+    .workout-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .workout-step:last-child {
+      border-bottom: none;
+    }
+    .step-num {
+      width: 22px;
+      height: 22px;
+      min-width: 22px;
+      border-radius: 50%;
+      background: var(--blue-bg);
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .step-info {
+      flex: 1;
+    }
+    .step-name {
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 500;
+    }
+    .step-detail {
+      font-size: 11px;
+      color: var(--sub2);
+      margin-top: 2px;
+    }
+    .step-target {
+      font-size: 11px;
+      color: var(--blue);
+      margin-top: 1px;
+    }
+    .workout-rest {
+      text-align: center;
+      padding: 8px;
+      font-size: 12px;
+      color: var(--energy);
+      background: var(--energy-bg);
+      border-radius: 6px;
+      margin: 8px 0;
+    }
+    .workout-flow {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      padding: 10px 14px;
+      background: var(--blue-bg);
+      border-radius: 8px;
+      margin-top: 8px;
+    }
+    .flow-step {
+      font-size: 11px;
+      color: var(--blue);
+      background: var(--blue-bg);
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+    .flow-arrow {
+      font-size: 10px;
+      color: var(--sub2);
+    }
+
+    /* Day counter */
+    .day-counter {
+      font-size: 12px;
+      color: var(--sub);
+      margin-top: 6px;
+    }
+
+    /* Settings */
+    .settings-section {
+      margin-bottom: 28px;
+    }
+    .settings-label {
+      font-size: 13px;
+      color: var(--sub);
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+    .settings-input {
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .settings-input:focus {
+      border-color: var(--primary);
+    }
+    .settings-hint {
+      font-size: 11px;
+      color: var(--sub2);
+      margin-top: 6px;
+    }
+    .settings-saved {
+      display: inline-block;
+      font-size: 12px;
+      color: var(--primary);
+      margin-top: 8px;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .settings-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+    }
+    .settings-card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 16px;
+    }
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .settings-row:last-child { margin-bottom: 0; }
+    .settings-row-label {
+      font-size: 14px;
+      color: var(--text);
+    }
+    .settings-row-input {
+      width: 120px;
+      padding: 8px 10px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      text-align: right;
+      outline: none;
+    }
+    .settings-row-input:focus { border-color: var(--primary); }
+    .settings-row-value {
+      font-size: 14px;
+      color: var(--primary);
+      font-weight: 600;
+    }
+    /* Toggle */
+    .toggle-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .toggle {
+      width: 44px;
+      height: 24px;
+      border-radius: 12px;
+      background: var(--check-unchecked);
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s;
+      border: none;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .toggle.on { background: var(--primary); }
+    .toggle-knob {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: left 0.2s;
+    }
+    .toggle.on .toggle-knob { left: 22px; }
+    /* Alarm row */
+    .alarm-row {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .alarm-row:last-child { border-bottom: none; }
+    .alarm-info { flex: 1; }
+    .alarm-name { font-size: 14px; color: var(--text); }
+    .alarm-time-input {
+      width: 80px;
+      padding: 6px 8px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 13px;
+      text-align: center;
+      outline: none;
+      margin-right: 10px;
+    }
+    .alarm-time-input:focus { border-color: var(--primary); }
+    .settings-reset-btn {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid var(--danger);
+      border-radius: 10px;
+      background: transparent;
+      color: var(--danger);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .settings-reset-btn:active { background: var(--danger-bg); }
+
+    /* Running tracker */
+    .running-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: calc(100dvh - 160px);
+      justify-content: center;
+      transition: background 0.4s;
+      margin: -20px;
+      padding: 20px;
+      border-radius: 0;
+    }
+    .running-wrap.active {
+      background: linear-gradient(180deg, rgba(232,93,58,0.08) 0%, transparent 60%);
+    }
+    .run-distance {
+      font-size: 64px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -2px;
+      line-height: 1;
+    }
+    .run-unit {
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--sub);
+      margin-left: 4px;
+    }
+    .run-stats {
+      display: flex;
+      gap: 28px;
+      margin-top: 28px;
+      margin-bottom: 40px;
+    }
+    .run-stat {
+      text-align: center;
+    }
+    .run-stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .run-stat-label {
+      font-size: 11px;
+      color: var(--sub2);
+      margin-top: 4px;
+    }
+    .run-controls {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .run-btn {
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.15s, box-shadow 0.15s;
+      font-weight: 700;
+      color: var(--text-inv);
+    }
+    .run-btn:active {
+      transform: scale(0.93);
+    }
+    .run-btn-start {
+      width: 88px;
+      height: 88px;
+      background: var(--primary);
+      font-size: 16px;
+      box-shadow: 0 4px 24px rgba(232,93,58,0.35);
+    }
+    .run-btn-pause {
+      width: 64px;
+      height: 64px;
+      background: var(--energy);
+      font-size: 13px;
+      box-shadow: 0 4px 20px rgba(255,140,66,0.3);
+    }
+    .run-btn-resume {
+      width: 64px;
+      height: 64px;
+      background: var(--primary);
+      font-size: 13px;
+      box-shadow: 0 4px 20px rgba(232,93,58,0.3);
+    }
+    .run-btn-stop {
+      width: 64px;
+      height: 64px;
+      background: var(--danger);
+      font-size: 13px;
+      box-shadow: 0 4px 20px rgba(244,67,54,0.3);
+    }
+    .run-gps-status {
+      font-size: 12px;
+      color: var(--sub2);
+      margin-top: 20px;
+    }
+    .run-gps-status.connected {
+      color: var(--success);
+    }
+    .run-summary {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 24px;
+      width: 100%;
+      margin-top: 20px;
+      border-left: 3px solid var(--primary);
+      box-shadow: var(--shadow);
+    }
+    .run-summary-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+    .run-summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .run-summary-row:last-child {
+      border-bottom: none;
+    }
+    .run-summary-label {
+      font-size: 14px;
+      color: var(--sub);
+    }
+    .run-summary-value {
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 600;
+    }
+    .run-history {
+      margin-top: 24px;
+      width: 100%;
+    }
+    .run-history-title {
+      font-size: 14px;
+      color: var(--sub);
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+    .run-history-item {
+      background: var(--card);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow);
+    }
+    .run-history-date {
+      font-size: 13px;
+      color: var(--sub);
+    }
+    .run-history-dist {
+      font-size: 15px;
+      color: var(--primary);
+      font-weight: 700;
+    }
+    .run-history-detail {
+      font-size: 11px;
+      color: var(--sub2);
+      margin-top: 2px;
+    }
+    .run-history-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .run-delete-btn {
+      border: none;
+      background: none;
+      color: var(--sub2);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      -webkit-tap-highlight-color: transparent;
+      transition: color 0.2s;
+    }
+    .run-delete-btn:hover {
+      color: var(--danger);
+    }
+    .run-new-btn {
+      border: none;
+      background: var(--primary-bg);
+      color: var(--primary);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 24px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 16px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Workout timer */
+    .wo-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: calc(100dvh - 160px);
+      margin: -20px;
+      padding: 24px 20px;
+      transition: background 0.5s;
+    }
+    .wo-wrap.wo-exercise {
+      background: linear-gradient(180deg, rgba(244,67,54,0.1) 0%, transparent 50%);
+    }
+    .wo-wrap.wo-rest {
+      background: linear-gradient(180deg, rgba(33,150,243,0.1) 0%, transparent 50%);
+    }
+    .wo-phase-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--sub);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    .wo-round {
+      font-size: 14px;
+      color: var(--primary);
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    /* Circular timer */
+    .wo-timer-ring {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      margin-bottom: 20px;
+    }
+    .wo-timer-ring svg {
+      transform: rotate(-90deg);
+      width: 200px;
+      height: 200px;
+    }
+    .wo-timer-ring circle {
+      fill: none;
+      stroke-width: 6;
+      stroke-linecap: round;
+    }
+    .wo-timer-bg {
+      stroke: var(--border);
+    }
+    .wo-timer-fg {
+      transition: stroke-dashoffset 0.3s linear;
+    }
+    .wo-timer-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    .wo-timer-seconds {
+      font-size: 56px;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1;
+    }
+    .wo-timer-status {
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    .wo-timer-status.exercise { color: var(--danger); }
+    .wo-timer-status.rest { color: var(--blue); }
+
+    /* Exercise info */
+    .wo-exercise-name {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .wo-exercise-target {
+      font-size: 13px;
+      color: var(--sub);
+      margin-bottom: 4px;
+    }
+    .wo-exercise-desc {
+      font-size: 12px;
+      color: var(--sub2);
+      margin-bottom: 16px;
+      text-align: center;
+      line-height: 1.5;
+      max-width: 300px;
+    }
+    .wo-next-preview {
+      font-size: 12px;
+      color: var(--sub2);
+      margin-top: 12px;
+    }
+
+    /* Workout controls */
+    .wo-controls {
+      display: flex;
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .wo-btn {
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: var(--text-inv);
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.15s;
+    }
+    .wo-btn:active { transform: scale(0.93); }
+    .wo-btn-start {
+      width: 88px;
+      height: 88px;
+      background: var(--primary);
+      font-size: 15px;
+      box-shadow: 0 4px 24px rgba(232,93,58,0.35);
+    }
+    .wo-btn-pause {
+      width: 60px;
+      height: 60px;
+      background: var(--energy);
+      font-size: 12px;
+    }
+    .wo-btn-resume {
+      width: 60px;
+      height: 60px;
+      background: var(--primary);
+      font-size: 12px;
+    }
+
+    /* Dumbbell / Plank set UI */
+    .wo-set-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+      width: 100%;
+      margin-bottom: 12px;
+      border-left: 3px solid var(--blue);
+      box-shadow: var(--shadow);
+    }
+    .wo-set-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .wo-set-subtitle {
+      font-size: 12px;
+      color: var(--sub);
+      margin-bottom: 14px;
+    }
+    .wo-set-progress {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .wo-set-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--check-unchecked);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--sub2);
+    }
+    .wo-set-dot.done {
+      border-color: var(--success);
+      background: var(--success);
+      color: var(--text-inv);
+    }
+    .wo-set-dot.current {
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+    .wo-set-btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: var(--blue);
+      color: var(--text-inv);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .wo-set-btn:disabled {
+      background: var(--check-unchecked);
+      color: var(--sub2);
+    }
+    .wo-set-rest {
+      text-align: center;
+      padding: 12px;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--blue);
+    }
+
+    /* Stickman */
+    .wo-stickman {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 16px;
+    }
+    .wo-stickman svg {
+      width: 120px;
+      height: 120px;
+    }
+    .wo-stickman line, .wo-stickman circle {
+      stroke: #FF8C42;
+      stroke-width: 3;
+      stroke-linecap: round;
+      fill: none;
+    }
+    .wo-stickman circle.head {
+      fill: #FF8C42;
+    }
+
+    /* Stickman animations */
+    @keyframes squat-legs {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(12px); }
+    }
+    @keyframes pushup-body {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(8px); }
+    }
+    @keyframes climber-legs {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(10px); }
+    }
+    @keyframes crunch-torso {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(-25deg); }
+    }
+    @keyframes burpee-full {
+      0% { transform: translateY(0) scale(1); }
+      25% { transform: translateY(10px) scale(0.9); }
+      50% { transform: translateY(15px) scaleY(0.7); }
+      75% { transform: translateY(5px) scale(0.95); }
+      100% { transform: translateY(0) scale(1); }
+    }
+    .stick-squat { animation: squat-legs 1.2s ease-in-out infinite; }
+    .stick-pushup { animation: pushup-body 1.5s ease-in-out infinite; }
+    .stick-climber { animation: climber-legs 0.6s ease-in-out infinite; }
+    .stick-crunch { animation: crunch-torso 1.4s ease-in-out infinite; transform-origin: bottom center; }
+    .stick-burpee { animation: burpee-full 2s ease-in-out infinite; }
+    .stick-paused { animation-play-state: paused !important; }
+
+    /* Workout done */
+    .wo-done-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 28px 24px;
+      width: 100%;
+      text-align: center;
+      border-left: 3px solid var(--primary);
+      box-shadow: var(--shadow);
+    }
+    .wo-done-emoji {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+    .wo-done-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+    .wo-done-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .wo-done-row:last-child { border-bottom: none; }
+    .wo-done-label { font-size: 14px; color: var(--sub); }
+    .wo-done-value { font-size: 14px; color: var(--text); font-weight: 600; }
+
+    /* A-day workout */
+    .wo-aday {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100dvh - 200px);
+      text-align: center;
+    }
+    .wo-aday-emoji { font-size: 64px; margin-bottom: 16px; }
+    .wo-aday-text { font-size: 18px; color: var(--text); margin-bottom: 24px; }
+    .wo-aday-btn {
+      padding: 14px 32px;
+      border: none;
+      border-radius: 12px;
+      background: var(--primary);
+      color: var(--text-inv);
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Diet page */
+    .diet-summary {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+    .diet-summary-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .diet-summary-row:last-child { margin-bottom: 0; }
+    .diet-summary-label {
+      font-size: 14px;
+      color: var(--text);
+      flex: 1;
+    }
+    .diet-summary-nums {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .diet-prog-bar {
+      width: 100%;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .diet-prog-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.3s, background 0.3s;
+    }
+
+    /* Meal section */
+    .meal-section {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+    }
+    .meal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .meal-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .meal-subtotal {
+      font-size: 12px;
+      color: var(--sub);
+    }
+    .meal-add-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 2px dashed var(--check-unchecked);
+      background: none;
+      color: var(--primary);
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+      transition: border-color 0.2s;
+    }
+    .meal-add-btn:hover { border-color: var(--primary); }
+
+    /* Food item */
+    .food-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .food-item:last-child { border-bottom: none; }
+    .food-info { flex: 1; }
+    .food-name {
+      font-size: 14px;
+      color: var(--text);
+    }
+    .food-meta {
+      font-size: 11px;
+      color: var(--sub);
+      margin-top: 2px;
+    }
+    .food-qty {
+      font-size: 13px;
+      color: var(--primary);
+      font-weight: 600;
+      margin-right: 12px;
+    }
+    .food-del-btn {
+      border: none;
+      background: none;
+      color: var(--sub2);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px 8px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .food-del-btn:hover { color: var(--danger); }
+    .meal-empty {
+      font-size: 13px;
+      color: var(--sub2);
+      text-align: center;
+      padding: 12px 0;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--overlay);
+      z-index: 200;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+    }
+    .modal-content {
+      width: 100%;
+      max-width: 430px;
+      max-height: 85dvh;
+      background: var(--bg);
+      border-radius: 20px 20px 0 0;
+      padding: 20px;
+      overflow-y: auto;
+      animation: modalUp 0.25s ease;
+    }
+    @keyframes modalUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .modal-close {
+      border: none;
+      background: none;
+      color: var(--sub);
+      font-size: 24px;
+      cursor: pointer;
+    }
+    .modal-search {
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      margin-bottom: 16px;
+    }
+    .modal-search:focus { border-color: var(--primary); }
+
+    /* Food grid */
+    .food-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .food-preset {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: border-color 0.2s;
+    }
+    .food-preset:active { border-color: var(--primary); }
+    .food-preset-name {
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .food-preset-info {
+      font-size: 11px;
+      color: var(--sub);
+    }
+
+    /* Custom food form */
+    .custom-form {
+      background: var(--card);
+      border-radius: 10px;
+      padding: 14px;
+    }
+    .custom-form-title {
+      font-size: 13px;
+      color: var(--sub);
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    .custom-form-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .custom-input {
+      flex: 1;
+      padding: 10px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+    }
+    .custom-input:focus { border-color: var(--primary); }
+    .custom-submit {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: var(--primary);
+      color: var(--text-inv);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .custom-submit:disabled { background: var(--check-unchecked); color: var(--sub2); }
+
+    /* Qty selector */
+    .qty-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin: 16px 0;
+    }
+    .qty-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--check-unchecked);
+      background: none;
+      color: var(--text);
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .qty-num {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text);
+      min-width: 30px;
+      text-align: center;
+    }
+    .qty-confirm {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: var(--primary);
+      color: var(--text-inv);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Weight tracker */
+    .wt-section {
+      margin-bottom: 20px;
+    }
+    .wt-input-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .wt-input-label {
+      font-size: 13px;
+      color: var(--sub);
+      white-space: nowrap;
+    }
+    .wt-input {
+      width: 90px;
+      padding: 10px 12px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 18px;
+      font-weight: 700;
+      text-align: center;
+      outline: none;
+    }
+    .wt-input:focus { border-color: var(--primary); }
+    .wt-unit { font-size: 14px; color: var(--sub); }
+    .wt-saved {
+      font-size: 12px;
+      color: var(--primary);
+      animation: fadeIn 0.3s ease;
+    }
+    .wt-chart-wrap {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+    }
+    .wt-chart-svg {
+      width: 100%;
+      height: 160px;
+      display: block;
+    }
+    .wt-tooltip {
+      position: absolute;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      color: var(--text);
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 50;
+      box-shadow: var(--shadow);
+    }
+    .wt-summary {
+      font-size: 13px;
+      color: var(--sub);
+      text-align: center;
+      margin-bottom: 6px;
+    }
+    .wt-summary-highlight {
+      color: var(--primary);
+      font-weight: 600;
+    }
+    .wt-summary-loss { color: var(--success); }
+    .wt-summary-gain { color: var(--danger); }
+
+    /* History section */
+    .hist-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      border-top: 1px solid var(--border);
+      margin-top: 20px;
+    }
+    .hist-toggle-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--sub);
+    }
+    .hist-toggle-arrow {
+      font-size: 12px;
+      color: var(--sub2);
+      transition: transform 0.25s;
+    }
+    .hist-toggle-arrow.open { transform: rotate(180deg); }
+    .hist-list {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease;
+    }
+    .hist-list.open { max-height: 2000px; }
+    .hist-card {
+      background: var(--card);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+      box-shadow: var(--shadow);
+    }
+    .hist-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .hist-date { font-size: 13px; color: var(--sub); font-weight: 600; }
+    .hist-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .hist-badge-run { background: var(--primary-bg); color: var(--primary); }
+    .hist-badge-workout { background: var(--blue-bg); color: var(--blue); }
+    .hist-card-stats {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .hist-stat {
+      font-size: 12px;
+      color: var(--sub);
+    }
+    .hist-stat b { color: var(--text); font-weight: 600; }
+    .hist-empty {
+      text-align: center;
+      font-size: 13px;
+      color: var(--sub2);
+      padding: 16px 0;
+    }
+
+    /* D-day & Weekly report */
+    .dday-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      background: var(--gold-bg);
+      color: var(--gold);
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 8px;
+    }
+    .weekly-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+    }
+    .weekly-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--sub);
+      margin-bottom: 14px;
+    }
+    .weekly-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .weekly-item {
+      text-align: center;
+    }
+    .weekly-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .weekly-label {
+      font-size: 11px;
+      color: var(--sub2);
+      margin-top: 4px;
+    }
+
+    /* Page title */
+    .page-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .page-subtitle {
+      font-size: 14px;
+      color: var(--sub2);
+      margin-top: 8px;
+    }
+
+    /* Bottom Nav */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 430px;
+      background: var(--nav-bg);
+      border-top: 1px solid var(--nav-border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0;
+      padding-bottom: max(8px, env(safe-area-inset-bottom));
+      z-index: 100;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--sub2);
+      font-size: 11px;
+      font-weight: 500;
+      transition: color 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-item.active {
+      color: var(--primary);
+    }
+    .nav-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .nav-icon svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+    /* Track background for running */
+    .track-bg {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      overflow: hidden;
+      pointer-events: none;
+      opacity: 0.08;
+    }
+    .track-lane {
+      position: absolute;
+      width: 200%;
+      height: 100%;
+      border: 3px solid var(--primary);
+      border-radius: 50%;
+      left: -50%;
+    }
+
+    /* Pulse animation for start button */
+    @keyframes pulse-ring {
+      0% { box-shadow: 0 0 0 0 rgba(232,93,58,0.4); }
+      70% { box-shadow: 0 0 0 20px rgba(232,93,58,0); }
+      100% { box-shadow: 0 0 0 0 rgba(232,93,58,0); }
+    }
+    .pulse { animation: pulse-ring 2s infinite; }
+
+    /* Round track lanes */
+    .round-lanes {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .round-lane {
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--border);
+      transition: background 0.3s;
+    }
+    .round-lane.done { background: var(--success); }
+    .round-lane.active { background: var(--energy); animation: blink 1s infinite; }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Track progress for diet */
+    .track-progress {
+      position: relative;
+      height: 8px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: visible;
+      margin: 8px 0;
+    }
+    .track-runner {
+      position: absolute;
+      top: -8px;
+      font-size: 16px;
+      transition: left 0.5s ease;
+    }
+    .track-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+
+    /* Streak flame */
+    @keyframes flame-sway {
+      0%, 100% { transform: rotate(-3deg); }
+      50% { transform: rotate(3deg); }
+    }
+    .streak-flame {
+      display: inline-block;
+      animation: flame-sway 0.6s ease-in-out infinite;
+    }
+
+    /* Achievement ring */
+    .achieve-ring {
+      position: relative;
+      width: 80px;
+      height: 80px;
+    }
+    .achieve-ring svg {
+      transform: rotate(-90deg);
+    }
+    .achieve-ring-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    .achieve-pct {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .achieve-label {
+      font-size: 9px;
+      color: var(--sub);
+    }
+  </style>
+</head>
+<body>
+  <script>
+    (function(){var t=localStorage.getItem('diet-theme')||'light';document.documentElement.dataset.theme=t;})();
+  </script>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useMemo, useEffect, useCallback } = React;
+
+    /* ─── Settings helpers ─── */
+    const DEFAULT_START = '2026-03-30';
+    function getStartDate() {
+      return localStorage.getItem('diet-start-date') || DEFAULT_START;
+    }
+    function setStartDate(dateStr) {
+      localStorage.setItem('diet-start-date', dateStr);
+    }
+    function getDayInfo() {
+      const start = new Date(getStartDate() + 'T00:00:00');
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const diff = Math.floor((today - start) / (1000 * 60 * 60 * 24));
+      const elapsed = diff < 0 ? 0 : diff;
+      const isA = elapsed % 2 === 0; // Day 0 = A
+      return { dayType: isA ? 'A' : 'B', isA, dayNumber: elapsed + 1 };
+    }
+
+    /* ─── Shared meal data (lunch & dinner) ─── */
+    const LUNCH_ITEMS = [
+      { id: 'l-1', text: '\uACE0\uAD6C\uB9C8 1\uAC1C' },
+      { id: 'l-2', text: '\uC0B6\uC740 \uB2EC\uAC78 3\uAC1C' },
+      { id: 'l-3', text: '\uADF8\uB9AD\uC694\uAC70\uD2B8 + \uBE14\uB8E8\uBCA0\uB9AC' },
+      { id: 'l-4', text: '\uACAC\uACFC\uB958 10\uC54C \uC774\uB0B4' },
+      { id: 'l-5', text: '\uB450\uBD80 \uBC18\uBAA8' },
+    ];
+    const DINNER_ITEMS = [
+      { id: 'd-1', text: '\uBAA9\uC0B4 or \uB2ED\uAC00\uC2B4\uC0B4 200g' },
+      { id: 'd-2', text: '\uCC44\uC18C (\uBE0C\uB85C\uCF5C\uB9AC, \uC591\uBC30\uCD94 \uB4F1)' },
+      { id: 'd-3', text: '\uACE0\uAD6C\uB9C8 1\uAC1C or \uBC14\uB098\uB098 1\uAC1C' },
+      { id: 'd-4', text: '\uC2DD\uD6C4 \uC0B0\uCC45 20~30\uBD84' },
+    ];
+
+    /* ─── Routine Data ─── */
+    const ROUTINES = {
+      A: [
+        {
+          slot: 'morning',
+          icon: '\uD83C\uDF05',
+          label: '\uC544\uCE68',
+          time: '9:30~11:00',
+          items: [
+            { id: 'a-m-1', text: '\uBB3C \uD55C \uC794 + \uCC9C\uC77C\uC5FC \uD55C \uAF2C\uC9D1' },
+            { id: 'a-m-2', text: '\uBC14\uB098\uB098 1\uAC1C' },
+            { id: 'a-m-3', text: '\uB3D9\uC801 \uC2A4\uD2B8\uB808\uCE6D 5~10\uBD84' },
+            { id: 'a-m-4', text: '\uC2AC\uB85C\uC6B0\uC870\uAE45 6~10km', sub: '\uB300\uD654 \uAC00\uB2A5\uD55C \uD398\uC774\uC2A4' },
+          ],
+        },
+        {
+          slot: 'lunch',
+          icon: '\u2600\uFE0F',
+          label: '\uC810\uC2EC',
+          time: '12:00~1:00',
+          items: LUNCH_ITEMS,
+        },
+        {
+          slot: 'dinner',
+          icon: '\uD83C\uDF19',
+          label: '\uC800\uB141',
+          time: '6:00~8:00',
+          items: DINNER_ITEMS,
+        },
+      ],
+      B: [
+        {
+          slot: 'morning',
+          icon: '\uD83C\uDF05',
+          label: '\uC544\uCE68',
+          time: '9:30~10:50',
+          items: [
+            { id: 'b-m-1', text: '\uBB3C \uD55C \uC794 + \uCC9C\uC77C\uC5FC \uD55C \uAF2C\uC9D1' },
+            { id: 'b-m-2', text: '\uBC14\uB098\uB098 1\uAC1C' },
+            { id: 'b-m-3', text: '\uB3D9\uC801 \uC2A4\uD2B8\uB808\uCE6D 5~10\uBD84' },
+            { id: 'b-m-4', text: '\uB9E8\uBAAC \uC778\uD130\uBC8C 3\uB77C\uC6B4\uB4DC', accordion: 'interval' },
+            { id: 'b-m-5', text: '\uC544\uB839 \uC6B4\uB3D9 (3\uC885\uBAA9)', accordion: 'dumbbell' },
+            { id: 'b-m-6', text: '\uD50C\uB7AD\uD06C \uB9C8\uBB34\uB9AC', accordion: 'plank' },
+          ],
+        },
+        {
+          slot: 'lunch',
+          icon: '\u2600\uFE0F',
+          label: '\uC810\uC2EC',
+          time: '12:00~1:00',
+          items: LUNCH_ITEMS,
+        },
+        {
+          slot: 'dinner',
+          icon: '\uD83C\uDF19',
+          label: '\uC800\uB141',
+          time: '6:00~8:00',
+          items: DINNER_ITEMS,
+        },
+      ],
+    };
+
+    /* ─── B-day accordion detail data ─── */
+    const ACCORDION_DATA = {
+      interval: {
+        title: '\uB9E8\uBAAC \uC778\uD130\uBC8C \uC0C1\uC138',
+        meta: '\uCD1D \uC57D 17\uBD84',
+        steps: [
+          { name: '\uC2A4\uCFFC\uD2B8', target: '\uD558\uCCB4', detail: '40\uCD08 \u2192 20\uCD08 \uD734\uC2DD' },
+          { name: '\uD314\uAD7D\uD600\uD3B4\uAE30', target: '\uC0C1\uCCB4', detail: '40\uCD08 \u2192 20\uCD08 \uD734\uC2DD' },
+          { name: '\uB9C8\uC6B4\uD2F4\uD074\uB77C\uC774\uBA38', target: '\uCF54\uC5B4+\uC804\uC2E0', detail: '40\uCD08 \u2192 20\uCD08 \uD734\uC2DD' },
+          { name: '\uBCF5\uADFC \uD06C\uB7F0\uCE58', target: '\uCF54\uC5B4', detail: '40\uCD08 \u2192 20\uCD08 \uD734\uC2DD' },
+          { name: '\uBC84\uD53C', target: '\uC804\uC2E0 (\uCD5C\uACE0\uAC15\uB3C4)', detail: '40\uCD08 \u2192 \uB77C\uC6B4\uB4DC \uB05D' },
+        ],
+        rest: '\uB77C\uC6B4\uB4DC \uC0AC\uC774 \uD734\uC2DD: 60\uCD08',
+        note: '\xD7 3\uB77C\uC6B4\uB4DC \uBC18\uBCF5',
+        afterRest: '\uC778\uD130\uBC8C \uC885\uB8CC \u2192 5\uBD84 \uD734\uC2DD \u2192 \uC544\uB839 \uC6B4\uB3D9',
+      },
+      dumbbell: {
+        title: '\uC544\uB839 \uC6B4\uB3D9 \uC0C1\uC138',
+        meta: '\uCD1D \uC57D 12\uBD84',
+        steps: [
+          { name: '\uBC14\uC774\uC149 \uCEEC', target: '\uD314 \uC774\uB450\uADFC', detail: '3\uC138\uD2B8 \xD7 12\uD68C / \uC138\uD2B8 \uC0AC\uC774 45\uCD08 \uD734\uC2DD' },
+          { name: '\uC204\uB354 \uD504\uB808\uC2A4', target: '\uC5B4\uAE68', detail: '3\uC138\uD2B8 \xD7 12\uD68C / \uC138\uD2B8 \uC0AC\uC774 45\uCD08 \uD734\uC2DD' },
+          { name: '\uC0AC\uC774\uB4DC \uB808\uD130\uB7F4 \uB808\uC774\uC988', target: '\uC5B4\uAE68 \uCE21\uBA74', detail: '3\uC138\uD2B8 \xD7 12\uD68C / \uC138\uD2B8 \uC0AC\uC774 45\uCD08 \uD734\uC2DD' },
+        ],
+      },
+      plank: {
+        title: '\uD50C\uB7AD\uD06C \uB9C8\uBB34\uB9AC \uC0C1\uC138',
+        meta: '\uCD1D \uC57D 4\uBD84',
+        steps: [
+          { name: '\uD50C\uB7AD\uD06C', target: '\uCF54\uC5B4 \uC804\uCCB4', detail: '1\uBD84 \xD7 3\uC138\uD2B8 / \uC138\uD2B8 \uC0AC\uC774 30\uCD08 \uD734\uC2DD' },
+        ],
+      },
+    };
+
+    const FLOW_STEPS = [
+      '\uC2A4\uD2B8\uB808\uCE6D (10\uBD84)',
+      '\uC778\uD130\uBC8C (17\uBD84)',
+      '\uD734\uC2DD (5\uBD84)',
+      '\uC544\uB839 (12\uBD84)',
+      '\uD50C\uB7AD\uD06C (4\uBD84)',
+    ];
+
+    /* ─── localStorage helpers ─── */
+    function getTodayKey() {
+      const d = new Date();
+      return `diet-${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+    }
+    function loadChecks() {
+      try { return JSON.parse(localStorage.getItem(getTodayKey())) || {}; }
+      catch { return {}; }
+    }
+    function saveChecks(checks) {
+      localStorage.setItem(getTodayKey(), JSON.stringify(checks));
+    }
+
+    /* ─── Icons (inline SVG) ─── */
+    const Icons = {
+      home: (
+        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      ),
+      running: (
+        <svg viewBox="0 0 24 24"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z"/></svg>
+      ),
+      fitness: (
+        <svg viewBox="0 0 24 24"><path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg>
+      ),
+      diet: (
+        <svg viewBox="0 0 24 24"><path d="M18.06 22.99h1.66c.84 0 1.53-.64 1.63-1.46L23 5.05h-5V1h-1.97v4.05h-4.97l.3 2.34c1.71.47 3.31 1.32 4.27 2.26 1.44 1.42 2.43 2.89 2.43 5.29v8.05zM1 21.99V21h15.03v.99c0 .55-.45 1-1.01 1H2.01c-.56 0-1.01-.45-1.01-1zm15.03-7c0-4.5-6.03-5-9.03-5s-5.98.5-5.98 5H1v2h15.03v-2zM1.02 17h15v2h-15z"/></svg>
+      ),
+      settings: (
+        <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+      ),
+    };
+
+    /* ─── Accordion component ─── */
+    function WorkoutAccordion({ accordionKey }) {
+      const [open, setOpen] = useState(false);
+      const data = ACCORDION_DATA[accordionKey];
+      if (!data) return null;
+      return (
+        <div className="accordion">
+          <div className={`accordion-header${open ? ' open' : ''}`} onClick={() => setOpen(!open)}>
+            <div>
+              <div className="accordion-title">{data.title}</div>
+              <div className="accordion-meta">{data.meta}</div>
+            </div>
+            <span className={`accordion-arrow${open ? ' open' : ''}`}>{'\u25BC'}</span>
+          </div>
+          <div className={`accordion-body${open ? ' open' : ''}`}>
+            <div className="accordion-content">
+              {data.steps.map((s, i) => (
+                <div className="workout-step" key={i}>
+                  <span className="step-num">{i + 1}</span>
+                  <div className="step-info">
+                    <div className="step-name">{s.name}</div>
+                    <div className="step-target">{s.target}</div>
+                    <div className="step-detail">{s.detail}</div>
+                  </div>
+                </div>
+              ))}
+              {data.rest && <div className="workout-rest">{data.rest}</div>}
+              {data.note && <div className="step-detail" style={{textAlign:'center',padding:'4px 0',color:'var(--blue)'}}>{data.note}</div>}
+              {data.afterRest && <div className="workout-rest" style={{background:'var(--success-bg)',color:'var(--success)'}}>{data.afterRest}</div>}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    /* ─── Tab pages ─── */
+    /* ─── Weight tracking helpers ─── */
+    function weightKey(d) {
+      return `diet-weight-${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+    }
+    function getTodayWeight() {
+      return parseFloat(localStorage.getItem(weightKey(new Date()))) || null;
+    }
+    function saveTodayWeight(val) {
+      localStorage.setItem(weightKey(new Date()), String(val));
+    }
+    function getWeightHistory(days) {
+      const result = [];
+      const now = new Date();
+      for (let i = days - 1; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+        const v = parseFloat(localStorage.getItem(weightKey(d)));
+        const label = `${d.getMonth()+1}/${d.getDate()}`;
+        result.push({ date: d, label, value: isNaN(v) ? null : v });
+      }
+      return result;
+    }
+
+    /* ─── SVG Weight Chart ─── */
+    function WeightChart({ data, goalWeight, startWeight }) {
+      const [tooltip, setTooltip] = useState(null);
+      const svgRef = React.useRef(null);
+
+      const points = data.filter(d => d.value !== null);
+      if (points.length === 0) {
+        return <div style={{textAlign:'center',padding:'20px 0',fontSize:13,color:'var(--sub2)'}}>체중을 입력하면 그래프가 표시됩니다</div>;
+      }
+
+      const W = 360, H = 140, PX = 36, PY = 16;
+      const allVals = [...points.map(p => p.value), goalWeight, startWeight];
+      const minV = Math.floor(Math.min(...allVals) - 0.5);
+      const maxV = Math.ceil(Math.max(...allVals) + 0.5);
+      const rangeV = maxV - minV || 1;
+
+      const toX = (i) => PX + ((W - PX * 2) * i / (data.length - 1 || 1));
+      const toY = (v) => PY + (H - PY * 2) * (1 - (v - minV) / rangeV);
+
+      // Actual data polyline
+      const dataPoints = [];
+      data.forEach((d, i) => { if (d.value !== null) dataPoints.push({ x: toX(i), y: toY(d.value), ...d }); });
+      const line = dataPoints.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
+
+      // Goal line
+      const goalY = toY(goalWeight);
+
+      // Ideal line (start to goal over full range)
+      const idealStart = toY(startWeight);
+      const idealEnd = toY(goalWeight);
+
+      // Y-axis labels
+      const yLabels = [];
+      const step = rangeV <= 4 ? 1 : 2;
+      for (let v = minV; v <= maxV; v += step) yLabels.push(v);
+
+      // X-axis labels (every ~7 days)
+      const xLabels = [];
+      const xStep = Math.max(1, Math.floor(data.length / 5));
+      for (let i = 0; i < data.length; i += xStep) xLabels.push({ i, label: data[i].label });
+      if (xLabels[xLabels.length - 1]?.i !== data.length - 1) xLabels.push({ i: data.length - 1, label: data[data.length - 1].label });
+
+      const handleClick = (e) => {
+        if (!svgRef.current) return;
+        const rect = svgRef.current.getBoundingClientRect();
+        const cx = (e.clientX - rect.left) / rect.width * W;
+        // Find nearest data point
+        let best = null, bestDist = Infinity;
+        dataPoints.forEach(p => {
+          const d = Math.abs(p.x - cx);
+          if (d < bestDist) { bestDist = d; best = p; }
+        });
+        if (best && bestDist < 30) {
+          setTooltip({ x: e.clientX - rect.left, y: e.clientY - rect.top - 40, label: best.label, value: best.value });
+          setTimeout(() => setTooltip(null), 2000);
+        }
+      };
+
+      return (
+        <div style={{position:'relative'}}>
+          <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} className="wt-chart-svg" onClick={handleClick}>
+            {/* Y-axis labels */}
+            {yLabels.map(v => (
+              <React.Fragment key={v}>
+                <line x1={PX} y1={toY(v)} x2={W - PX} y2={toY(v)} stroke="var(--border)" strokeWidth="1" />
+                <text x={PX - 4} y={toY(v) + 4} textAnchor="end" fill="var(--sub2)" fontSize="9">{v}</text>
+              </React.Fragment>
+            ))}
+            {/* X-axis labels */}
+            {xLabels.map(xl => (
+              <text key={xl.i} x={toX(xl.i)} y={H - 2} textAnchor="middle" fill="var(--sub2)" fontSize="8">{xl.label}</text>
+            ))}
+            {/* Ideal line */}
+            <line x1={PX} y1={idealStart} x2={W - PX} y2={idealEnd} stroke="var(--primary-bg)" strokeWidth="1" strokeDasharray="4,4" />
+            {/* Goal line */}
+            <line x1={PX} y1={goalY} x2={W - PX} y2={goalY} stroke="#FFD700" strokeWidth="1" strokeDasharray="4,3" />
+            <text x={W - PX + 2} y={goalY + 3} fill="#FFD700" fontSize="8">{goalWeight}</text>
+            {/* Data line */}
+            <path d={line} fill="none" stroke="var(--primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            {/* Data dots */}
+            {dataPoints.map((p, i) => (
+              <circle key={i} cx={p.x} cy={p.y} r="3" fill="var(--primary)" stroke="var(--card)" strokeWidth="1.5" />
+            ))}
+          </svg>
+          {tooltip && (
+            <div className="wt-tooltip" style={{left: tooltip.x - 30, top: tooltip.y}}>
+              {tooltip.label} — <strong>{tooltip.value}kg</strong>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    /* ─── Weekly Report helper ─── */
+    function getWeeklyReport() {
+      const now = new Date();
+      const dayOfWeek = now.getDay(); // 0=Sun
+      const mondayOffset = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+      const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - mondayOffset);
+
+      let totalKcalDays = 0, totalKcal = 0, workoutCount = 0, totalRunKm = 0;
+      const weightValues = [];
+
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);
+        if (d > now) break;
+        const ds = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+
+        // Diet calories
+        try {
+          const diet = JSON.parse(localStorage.getItem(`diet-v2-${ds}`));
+          if (diet && diet.checked) {
+            let dayKcal = 0;
+            Object.keys(diet.checked).forEach(k => {
+              if (!diet.checked[k]) return;
+              // We can't easily recalc from keys alone, so skip detailed calc
+            });
+          }
+        } catch {}
+
+        // Workout
+        try {
+          const wo = JSON.parse(localStorage.getItem(`diet-workout-${ds}`));
+          if (wo && wo.completed) workoutCount++;
+        } catch {}
+
+        // Weight
+        const wv = parseFloat(localStorage.getItem(`diet-weight-${ds}`));
+        if (!isNaN(wv)) weightValues.push(wv);
+      }
+
+      // Running (from run history array)
+      try {
+        const runs = JSON.parse(localStorage.getItem('diet-run-history')) || [];
+        runs.forEach(r => {
+          const rd = new Date(r.date);
+          if (rd >= monday && rd <= now) totalRunKm += (r.distKm || 0);
+        });
+      } catch {}
+
+      const wtStart = weightValues.length > 0 ? weightValues[0] : null;
+      const wtEnd = weightValues.length > 0 ? weightValues[weightValues.length - 1] : null;
+      const wtChange = wtStart !== null && wtEnd !== null ? (wtEnd - wtStart).toFixed(1) : null;
+
+      return { workoutCount, totalRunKm: Math.round(totalRunKm * 100) / 100, wtStart, wtEnd, wtChange };
+    }
+
+    /* ─── Diet-Home sync helpers ─── */
+    function getDietMealChecked() {
+      const diet = loadDiet();
+      const ck = diet.checked || {};
+      const meatType = diet.meatType || 'mok';
+      const dinnerKey = meatType === 'dak' ? 'dinner_dak' : 'dinner_mok';
+      // Check if ALL default items in a section are checked
+      const allChecked = (section, defaults) => defaults.every(f => ck[section + '-' + f.id]);
+      const lunchDone = allChecked('lunch', DEFAULT_MEALS.lunch);
+      const dinnerDone = allChecked('dinner', DEFAULT_MEALS[dinnerKey]);
+      const snackDone = !!ck['snack-ds-1'];
+      // Calc totals from checked items only
+      let totalKcal = 0, totalProt = 0;
+      const addSection = (section, defaults) => {
+        defaults.forEach(f => {
+          if (ck[section + '-' + f.id]) { totalKcal += f.kcal; totalProt += f.protein; }
+        });
+        // extras
+        ((diet.extras || {})[section] || []).forEach(f => {
+          if (ck[section + '-' + f.id]) { totalKcal += f.kcal * (f.qty || 1); totalProt += f.protein * (f.qty || 1); }
+        });
+      };
+      addSection('lunch', DEFAULT_MEALS.lunch);
+      addSection('dinner', DEFAULT_MEALS[dinnerKey]);
+      addSection('snack', DEFAULT_MEALS.snack);
+      // Collect checked extras for display on home
+      const getExtras = (section) => ((diet.extras || {})[section] || []).filter(f => ck[section + '-' + f.id]);
+      const extras = {
+        lunch: getExtras('lunch'),
+        dinner: getExtras('dinner'),
+        snack: getExtras('snack'),
+      };
+      return { lunchDone, dinnerDone, snackDone, totalKcal: Math.round(totalKcal), totalProt: Math.round(totalProt * 10) / 10, extras };
+    }
+
+    function HomePage() {
+      const [checks, setChecks] = useState(loadChecks);
+      const [dietSync, setDietSync] = useState(getDietMealChecked);
+      const { dayType, isA, dayNumber } = getDayInfo();
+      const routine = ROUTINES[dayType];
+      const cardClass = isA ? '' : ' day-b';
+
+      // Re-sync diet data periodically (when tab becomes visible)
+      useEffect(() => {
+        const sync = () => setDietSync(getDietMealChecked());
+        window.addEventListener('focus', sync);
+        const iv = setInterval(sync, 2000);
+        return () => { window.removeEventListener('focus', sync); clearInterval(iv); };
+      }, []);
+
+      const toggle = useCallback((id) => {
+        setChecks((prev) => {
+          const next = { ...prev, [id]: !prev[id] };
+          saveChecks(next);
+          return next;
+        });
+      }, []);
+
+      // Determine if a home item is checked (diet-synced or manual)
+      const isItemChecked = (mealSlot, itemId) => {
+        // Lunch items: synced from diet
+        if (mealSlot === 'lunch') return dietSync.lunchDone;
+        // Dinner: d-4 (산책) is manual, d-1~d-3 synced from diet
+        if (mealSlot === 'dinner' && itemId === 'd-4') return !!checks[itemId];
+        if (mealSlot === 'dinner') return dietSync.dinnerDone;
+        // Morning items: manual checks
+        return !!checks[itemId];
+      };
+
+      // Weight tracking
+      const [todayWt, setTodayWt] = useState(() => getTodayWeight());
+      const [wtSaved, setWtSaved] = useState(false);
+      const [wtHistory, setWtHistory] = useState(() => getWeightHistory(30));
+      const settings = loadSettings();
+      const startWt = settings.weight || 71;
+      const goalWt = settings.goalWeight || 67;
+
+      // D-day
+      const goalDate = new Date((settings.goalDate || '2026-06-01') + 'T00:00:00');
+      const today = new Date();
+      const todayMid = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const dDayNum = Math.ceil((goalDate - todayMid) / (1000*60*60*24));
+      const dDayText = dDayNum > 0 ? `D-${dDayNum}` : dDayNum === 0 ? 'D-Day! \uD83C\uDF89' : `D+${Math.abs(dDayNum)}`;
+
+      // Weekly report
+      const weekly = useMemo(() => getWeeklyReport(), []);
+
+      const handleWtChange = useCallback((e) => {
+        const v = parseFloat(e.target.value);
+        setTodayWt(e.target.value);
+        if (v > 0) {
+          saveTodayWeight(v);
+          setWtHistory(getWeightHistory(30));
+          setWtSaved(true);
+          setTimeout(() => setWtSaved(false), 1500);
+        }
+      }, []);
+
+      // Weight summary
+      const wtPoints = wtHistory.filter(d => d.value !== null);
+      const currentWt = wtPoints.length > 0 ? wtPoints[wtPoints.length - 1].value : null;
+      const wtDiff = currentWt !== null ? (currentWt - startWt).toFixed(1) : null;
+      // Weekly avg change
+      const recentWeek = wtPoints.slice(-7);
+      const weeklyChange = recentWeek.length >= 2
+        ? ((recentWeek[recentWeek.length-1].value - recentWeek[0].value) / (recentWeek.length - 1) * 7).toFixed(2)
+        : null;
+
+      const checkIcon = (
+        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+      );
+
+      // Achievement: % of morning items + diet items checked today
+      const morningItems = routine[0].items;
+      const morningChecked = morningItems.filter(it => !!checks[it.id]).length;
+      const dietChecked = (dietSync.lunchDone ? routine[1].items.length : 0) + (dietSync.dinnerDone ? routine[2].items.length : 0);
+      const totalItems = routine.reduce((s, m) => s + m.items.length, 0);
+      const totalChecked = morningChecked + dietChecked + (routine[2].items.filter(it => it.id === 'd-4' && !!checks[it.id]).length);
+      const achievePct = totalItems > 0 ? Math.round((totalChecked / totalItems) * 100) : 0;
+
+      // Streak: consecutive days with at least 1 check
+      const streakCount = useMemo(() => {
+        let streak = 0;
+        const now = new Date();
+        for (let i = 0; i < 60; i++) {
+          const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+          const key = `diet-${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+          try {
+            const data = JSON.parse(localStorage.getItem(key));
+            if (data && Object.values(data).some(v => v === true)) { streak++; }
+            else if (i > 0) break;
+          } catch { if (i > 0) break; }
+        }
+        return streak;
+      }, []);
+
+      // Achievement ring SVG
+      const ringR = 32;
+      const ringCirc = 2 * Math.PI * ringR;
+      const ringOffset = ringCirc * (1 - achievePct / 100);
+
+      return (
+        <div>
+          <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:12,flexWrap:'wrap'}}>
+            <div className="achieve-ring">
+              <svg width="80" height="80" viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r={ringR} fill="none" stroke="var(--border)" strokeWidth="6" />
+                <circle cx="40" cy="40" r={ringR} fill="none" stroke="var(--primary)" strokeWidth="6"
+                  strokeLinecap="round" strokeDasharray={ringCirc} strokeDashoffset={ringOffset}
+                  style={{transition:'stroke-dashoffset 0.5s ease'}} />
+              </svg>
+              <div className="achieve-ring-center">
+                <div className="achieve-pct">{achievePct}</div>
+                <div className="achieve-label">%</div>
+              </div>
+            </div>
+            <div style={{flex:1}}>
+              <div className="day-badge" style={isA ? {marginBottom:0} : { background: 'var(--energy-bg)', color: 'var(--energy)', marginBottom:0 }}>
+                <span className="dot" style={isA ? {} : { background: 'var(--energy)' }} />
+                {isA ? '\uC870\uAE45\uC77C (A)' : '\uB9E8\uBAAC \uC778\uD130\uBC8C\uC77C (B)'}
+              </div>
+              <div style={{display:'flex',alignItems:'center',gap:8,marginTop:6}}>
+                <div className="dday-badge">{dDayText}</div>
+                {streakCount > 0 && (
+                  <div style={{fontSize:14,fontWeight:700,color:'var(--energy)'}}>
+                    <span className="streak-flame">{'\uD83D\uDD25'}</span> {streakCount}day streak
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          <div style={{display:'flex',alignItems:'center',gap:16,marginBottom:8}}>
+            <div className="day-counter" style={{marginBottom:0}}>Day {dayNumber}</div>
+            {dietSync.totalKcal > 0 && (
+              <div style={{fontSize:13,color:'var(--primary)',fontWeight:600}}>
+                {'\uD83D\uDD25'} {dietSync.totalKcal.toLocaleString()}kcal | {'\uD83E\uDD69'} {dietSync.totalProt}g
+              </div>
+            )}
+          </div>
+
+          {/* Weight tracker */}
+          <div className="wt-section">
+            <div className="wt-input-row">
+              <span className="wt-input-label">{'\u2696\uFE0F'} {'\uC624\uB298 \uCCB4\uC911'}</span>
+              <input className="wt-input" type="number" inputMode="decimal" step="0.1"
+                value={todayWt || ''} onChange={handleWtChange} placeholder="--" />
+              <span className="wt-unit">kg</span>
+              {wtSaved && <span className="wt-saved">{'\u2713'}</span>}
+            </div>
+            <div className="wt-chart-wrap">
+              <WeightChart data={wtHistory} goalWeight={goalWt} startWeight={startWt} />
+            </div>
+            {currentWt !== null && (
+              <div className="wt-summary">
+                {'\uC2DC\uC791'} {startWt}kg {'\u2192'} {'\uD604\uC7AC'} <span className="wt-summary-highlight">{currentWt}kg</span>
+                {' ('}
+                <span className={parseFloat(wtDiff) <= 0 ? 'wt-summary-loss' : 'wt-summary-gain'}>
+                  {parseFloat(wtDiff) > 0 ? '+' : ''}{wtDiff}kg
+                </span>
+                {')'}
+                {weeklyChange !== null && (
+                  <span style={{marginLeft:8,color:'var(--sub)'}}>
+                    | {'\uC8FC\uAC04'} {parseFloat(weeklyChange) > 0 ? '+' : ''}{weeklyChange}kg
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Weekly Report */}
+          <div className="weekly-card">
+            <div className="weekly-title">{'\uD83D\uDCCA'} {'\uC774\uBC88 \uC8FC \uC694\uC57D'}</div>
+            <div className="weekly-grid">
+              <div className="weekly-item">
+                <div className="weekly-value">{weekly.workoutCount}{'\uD68C'}</div>
+                <div className="weekly-label">{'\uC6B4\uB3D9 \uD69F\uC218'}</div>
+              </div>
+              <div className="weekly-item">
+                <div className="weekly-value">{weekly.totalRunKm}km</div>
+                <div className="weekly-label">{'\uCD1D \uB7EC\uB2DD'}</div>
+              </div>
+              <div className="weekly-item">
+                {weekly.wtChange !== null ? (
+                  <>
+                    <div className="weekly-value" style={{color: parseFloat(weekly.wtChange) <= 0 ? 'var(--success)' : 'var(--danger)'}}>
+                      {parseFloat(weekly.wtChange) > 0 ? '+' : ''}{weekly.wtChange}kg
+                    </div>
+                    <div className="weekly-label">{weekly.wtStart}{'\u2192'}{weekly.wtEnd}kg</div>
+                  </>
+                ) : (
+                  <>
+                    <div className="weekly-value" style={{color:'var(--sub2)'}}>-</div>
+                    <div className="weekly-label">{'\uCCB4\uC911 \uAE30\uB85D \uC5C6\uC74C'}</div>
+                  </>
+                )}
+              </div>
+              <div className="weekly-item">
+                <div className="weekly-value">{dDayText}</div>
+                <div className="weekly-label">{'\uBAA9\uD45C\uAE4C\uC9C0'}</div>
+              </div>
+            </div>
+          </div>
+
+          {!isA && (
+            <div className="workout-flow" style={{marginBottom: 16, marginTop: 12}}>
+              {FLOW_STEPS.map((s, i) => (
+                <React.Fragment key={i}>
+                  {i > 0 && <span className="flow-arrow">{'\u2192'}</span>}
+                  <span className="flow-step">{s}</span>
+                </React.Fragment>
+              ))}
+            </div>
+          )}
+
+          <div className="timeline" style={{marginTop: isA ? 16 : 0}}>
+            {routine.map((meal) => {
+              const done = meal.items.filter((it) => {
+                if (meal.slot === 'lunch') return dietSync.lunchDone;
+                if (meal.slot === 'dinner' && it.id === 'd-4') return !!checks[it.id];
+                if (meal.slot === 'dinner') return dietSync.dinnerDone;
+                return !!checks[it.id];
+              }).length;
+              const total = meal.items.length;
+              const pct = Math.round((done / total) * 100);
+              return (
+                <div className={`timeline-card${cardClass}`} key={meal.slot}>
+                  <div className="timeline-time">{meal.icon} {meal.label} {meal.time}</div>
+                  <ul className="checklist">
+                    {meal.items.map((item) => {
+                      const itemChecked = isItemChecked(meal.slot, item.id);
+                      const isMealSync = (meal.slot === 'lunch') || (meal.slot === 'dinner' && item.id !== 'd-4');
+                      return (
+                        <li key={item.id}>
+                          <div
+                            className={`check-item${itemChecked ? ' checked' : ''}`}
+                            onClick={() => {
+                              if (isMealSync) return; // synced from diet tab, not manually togglable
+                              toggle(item.id);
+                            }}
+                            style={isMealSync ? {cursor:'default'} : {}}
+                          >
+                            <span className="check-box">{checkIcon}</span>
+                            <span>
+                              <span className="check-text">{item.text}</span>
+                              {item.sub && <div className="check-sub">{item.sub}</div>}
+                              {isMealSync && !itemChecked && <div className="check-sub">{'\uC2DD\uB2E8 \uD0ED\uC5D0\uC11C \uCCB4\uD06C'}</div>}
+                            </span>
+                          </div>
+                          {item.accordion && <WorkoutAccordion accordionKey={item.accordion} />}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  {/* Show extras added from diet tab */}
+                  {(meal.slot === 'lunch' || meal.slot === 'dinner' || meal.slot === 'snack') &&
+                    (dietSync.extras[meal.slot === 'dinner' ? 'dinner' : meal.slot] || []).length > 0 && (
+                    <div style={{marginTop:8,paddingTop:8,borderTop:'1px solid var(--border)'}}>
+                      {(dietSync.extras[meal.slot === 'dinner' ? 'dinner' : meal.slot]).map((f, i) => (
+                        <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'4px 10px',fontSize:12,color:'var(--primary)'}}>
+                          <span>{'\u2713'} {f.name}{(f.qty || 1) > 1 ? ` \u00D7${f.qty}` : ''}</span>
+                          <span style={{color:'var(--sub)'}}>{Math.round(f.kcal * (f.qty || 1))}kcal</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <div className="card-progress">
+                    <div className="progress-bar">
+                      <div
+                        className={`progress-fill ${isA ? 'green' : 'blue'}`}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                    <span className="progress-text">{done}/{total} {'\uC644\uB8CC'}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    /* ─── Running helpers ─── */
+    function getWeight() {
+      return loadSettings().weight || 71;
+    }
+    function haversine(lat1, lon1, lat2, lon2) {
+      const R = 6371000;
+      const toRad = (d) => (d * Math.PI) / 180;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+    function formatTime(sec) {
+      const h = String(Math.floor(sec / 3600)).padStart(2, '0');
+      const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
+      const s = String(sec % 60).padStart(2, '0');
+      return `${h}:${m}:${s}`;
+    }
+    function formatPace(distKm, sec) {
+      if (distKm < 0.01) return "-'--\"";
+      const paceS = sec / distKm;
+      const pm = Math.floor(paceS / 60);
+      const ps = Math.floor(paceS % 60);
+      return `${pm}'${String(ps).padStart(2, '0')}"`;
+    }
+    /* ─── Workout history loader ─── */
+    function loadWorkoutHistory() {
+      const results = [];
+      const now = new Date();
+      for (let i = 0; i < 30; i++) {
+        const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+        const key = `diet-workout-${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+        try {
+          const data = JSON.parse(localStorage.getItem(key));
+          if (data && data.completed) {
+            results.push({
+              date: d,
+              label: `${d.getMonth()+1}/${d.getDate()}`,
+              totalTime: data.totalTime || 0,
+              kcal: data.kcal || 250,
+            });
+          }
+        } catch {}
+      }
+      return results;
+    }
+
+    /* ─── Collapsible History Section ─── */
+    function HistorySection({ title, children, count }) {
+      const [open, setOpen] = useState(false);
+      return (
+        <div style={{width:'100%'}}>
+          <div className="hist-toggle" onClick={() => setOpen(!open)}>
+            <span className="hist-toggle-title">{title} {count > 0 && `(${count})`}</span>
+            <span className={`hist-toggle-arrow${open ? ' open' : ''}`}>{'\u25BC'}</span>
+          </div>
+          <div className={`hist-list${open ? ' open' : ''}`}>
+            {children}
+          </div>
+        </div>
+      );
+    }
+
+    function getRunHistoryKey() { return 'diet-run-history'; }
+    function loadRunHistory() {
+      try { return JSON.parse(localStorage.getItem(getRunHistoryKey())) || []; }
+      catch { return []; }
+    }
+    function saveRunRecord(record) {
+      const hist = loadRunHistory();
+      hist.unshift(record);
+      if (hist.length > 30) hist.length = 30;
+      localStorage.setItem(getRunHistoryKey(), JSON.stringify(hist));
+    }
+
+    function deleteRunRecord(index) {
+      const hist = loadRunHistory();
+      hist.splice(index, 1);
+      localStorage.setItem(getRunHistoryKey(), JSON.stringify(hist));
+      return hist;
+    }
+
+    function RunningPage() {
+      const [status, setStatus] = useState('idle'); // idle | running | paused | done
+      const [distance, setDistance] = useState(0);
+      const [elapsed, setElapsed] = useState(0);
+      const [gpsOk, setGpsOk] = useState(false);
+      const [summary, setSummary] = useState(null);
+      const [history, setHistory] = useState(loadRunHistory);
+
+      const lastPos = React.useRef(null);
+      const watchId = React.useRef(null);
+      const timerId = React.useRef(null);
+      const distRef = React.useRef(0);
+      const elapsedRef = React.useRef(0);
+      const statusRef = React.useRef('idle');
+
+      useEffect(() => {
+        statusRef.current = status;
+      }, [status]);
+
+      const startTimer = useCallback(() => {
+        if (timerId.current) return;
+        timerId.current = setInterval(() => {
+          if (statusRef.current === 'running') {
+            elapsedRef.current += 1;
+            setElapsed(elapsedRef.current);
+          }
+        }, 1000);
+      }, []);
+
+      const stopTimer = useCallback(() => {
+        if (timerId.current) { clearInterval(timerId.current); timerId.current = null; }
+      }, []);
+
+      const startGps = useCallback(() => {
+        if (watchId.current != null) return;
+        if (!navigator.geolocation) return;
+        watchId.current = navigator.geolocation.watchPosition(
+          (pos) => {
+            setGpsOk(true);
+            if (statusRef.current !== 'running') return;
+            const { latitude, longitude } = pos.coords;
+            if (lastPos.current) {
+              const d = haversine(lastPos.current.lat, lastPos.current.lon, latitude, longitude);
+              if (d >= 5) {
+                distRef.current += d;
+                setDistance(distRef.current);
+                lastPos.current = { lat: latitude, lon: longitude };
+              }
+            } else {
+              lastPos.current = { lat: latitude, lon: longitude };
+            }
+          },
+          () => setGpsOk(false),
+          { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 }
+        );
+      }, []);
+
+      const stopGps = useCallback(() => {
+        if (watchId.current != null) {
+          navigator.geolocation.clearWatch(watchId.current);
+          watchId.current = null;
+        }
+      }, []);
+
+      useEffect(() => () => { stopTimer(); stopGps(); }, [stopTimer, stopGps]);
+
+      const handleStart = useCallback(() => {
+        distRef.current = 0; elapsedRef.current = 0;
+        lastPos.current = null;
+        setDistance(0); setElapsed(0); setSummary(null);
+        setStatus('running');
+        startGps(); startTimer();
+      }, [startGps, startTimer]);
+
+      const handlePause = useCallback(() => setStatus('paused'), []);
+      const handleResume = useCallback(() => { lastPos.current = null; setStatus('running'); }, []);
+
+      const handleStop = useCallback(() => {
+        stopTimer(); stopGps();
+        const distKm = distRef.current / 1000;
+        const sec = elapsedRef.current;
+        const cal = Math.round(getWeight() * distKm * 1.0);
+        const record = {
+          date: new Date().toISOString(),
+          distKm: Math.round(distKm * 100) / 100,
+          seconds: sec,
+          pace: formatPace(distKm, sec),
+          kcal: cal,
+        };
+        saveRunRecord(record);
+        setSummary(record);
+        setHistory(loadRunHistory());
+        setStatus('done');
+      }, [stopTimer, stopGps]);
+
+      const handleDelete = useCallback((index) => {
+        const updated = deleteRunRecord(index);
+        setHistory(updated);
+      }, []);
+
+      const handleNew = useCallback(() => {
+        setStatus('idle'); setSummary(null);
+        distRef.current = 0; elapsedRef.current = 0;
+        lastPos.current = null;
+        setDistance(0); setElapsed(0);
+      }, []);
+
+      const distKm = distance / 1000;
+      const weight = getWeight();
+      const calories = Math.round(weight * distKm * 1.0);
+      const isActive = status === 'running' || status === 'paused';
+
+      if (summary) {
+        return (
+          <div className="running-wrap">
+            <div className="run-summary">
+              <div className="run-summary-title">{'\uD83C\uDFC3'} 러닝 완료!</div>
+              <div className="run-summary-row">
+                <span className="run-summary-label">총 거리</span>
+                <span className="run-summary-value">{summary.distKm} km</span>
+              </div>
+              <div className="run-summary-row">
+                <span className="run-summary-label">총 시간</span>
+                <span className="run-summary-value">{formatTime(summary.seconds)}</span>
+              </div>
+              <div className="run-summary-row">
+                <span className="run-summary-label">평균 페이스</span>
+                <span className="run-summary-value">{summary.pace}/km</span>
+              </div>
+              <div className="run-summary-row">
+                <span className="run-summary-label">{'\uD83D\uDD25'} 소모 칼로리</span>
+                <span className="run-summary-value">{summary.kcal} kcal</span>
+              </div>
+            </div>
+            <button className="run-new-btn" onClick={handleNew}>새 러닝 시작</button>
+            {history.length > 0 && (
+              <div className="run-history">
+                <div className="run-history-title">최근 기록</div>
+                {history.slice(0, 5).map((r, i) => {
+                  const d = new Date(r.date);
+                  const ds = `${d.getMonth()+1}/${d.getDate()}`;
+                  return (
+                    <div className="run-history-item" key={i}>
+                      <div>
+                        <div className="run-history-date">{ds}</div>
+                        <div className="run-history-detail">{formatTime(r.seconds)} | {r.pace}/km | {r.kcal}kcal</div>
+                      </div>
+                      <div className="run-history-right">
+                        <div className="run-history-dist">{r.distKm} km</div>
+                        <button className="run-delete-btn" onClick={() => handleDelete(i)}>{'\u00D7'}</button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      return (
+        <div className={`running-wrap${status === 'running' ? ' active' : ''}`} style={{position:'relative'}}>
+          {status === 'running' && (
+            <div className="track-bg">
+              <div className="track-lane" style={{top:'20%'}} />
+              <div className="track-lane" style={{top:'40%'}} />
+              <div className="track-lane" style={{top:'60%'}} />
+            </div>
+          )}
+          <div className="run-distance">
+            {distKm.toFixed(2)}<span className="run-unit">km</span>
+          </div>
+          <div className="run-stats">
+            <div className="run-stat">
+              <div className="run-stat-value">{formatTime(elapsed)}</div>
+              <div className="run-stat-label">경과 시간</div>
+            </div>
+            <div className="run-stat">
+              <div className="run-stat-value">{formatPace(distKm, elapsed)}</div>
+              <div className="run-stat-label">페이스/km</div>
+            </div>
+            <div className="run-stat">
+              <div className="run-stat-value">{'\uD83D\uDD25'} {calories}</div>
+              <div className="run-stat-label">kcal</div>
+            </div>
+          </div>
+          <div className="run-controls">
+            {status === 'idle' && (
+              <button className="run-btn run-btn-start pulse" onClick={handleStart}>START</button>
+            )}
+            {status === 'running' && (
+              <>
+                <button className="run-btn run-btn-pause" onClick={handlePause}>PAUSE</button>
+                <button className="run-btn run-btn-stop" onClick={handleStop}>STOP</button>
+              </>
+            )}
+            {status === 'paused' && (
+              <>
+                <button className="run-btn run-btn-resume" onClick={handleResume}>GO</button>
+                <button className="run-btn run-btn-stop" onClick={handleStop}>STOP</button>
+              </>
+            )}
+          </div>
+          <div className={`run-gps-status${gpsOk ? ' connected' : ''}`}>
+            {status === 'idle'
+              ? 'GPS 준비 중...'
+              : gpsOk ? '\u25CF GPS 연결됨' : '\u25CB GPS 연결 대기'}
+          </div>
+          {status === 'idle' && (
+            <HistorySection title={'\uD83D\uDCCB \uB7EC\uB2DD \uAE30\uB85D'} count={history.length}>
+              {history.length === 0 ? (
+                <div className="hist-empty">{'\uC544\uC9C1 \uAE30\uB85D\uC774 \uC5C6\uC2B5\uB2C8\uB2E4'}</div>
+              ) : (
+                history.slice(0, 30).map((r, i) => {
+                  const d = new Date(r.date);
+                  const ds = `${d.getMonth()+1}\uC6D4 ${d.getDate()}\uC77C`;
+                  return (
+                    <div className="hist-card" key={i}>
+                      <div className="hist-card-top">
+                        <span className="hist-date">{ds}</span>
+                        <div style={{display:'flex',alignItems:'center',gap:8}}>
+                          <span className="hist-badge hist-badge-run">{r.distKm}km</span>
+                          <button className="run-delete-btn" onClick={() => handleDelete(i)}>{'\u00D7'}</button>
+                        </div>
+                      </div>
+                      <div className="hist-card-stats">
+                        <span className="hist-stat">{'\u23F1'} <b>{formatTime(r.seconds)}</b></span>
+                        <span className="hist-stat">{'\uD83D\uDCA8'} <b>{r.pace}/km</b></span>
+                        <span className="hist-stat">{'\uD83D\uDD25'} <b>{r.kcal}kcal</b></span>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </HistorySection>
+          )}
+        </div>
+      );
+    }
+
+    /* ─── Workout data & helpers ─── */
+    const INTERVAL_EXERCISES = [
+      { name: '\uC2A4\uCFFC\uD2B8', target: '\uD558\uCCB4', desc: '\uBC1C \uC5B4\uAE68\uB108\uBE44\uB85C \uBC8C\uB9AC\uACE0, \uC5C9\uB369\uC774\uB97C \uB4A4\uB85C \uBE7C\uBA70 \uD5C8\uBC85\uC9C0\uAC00 \uC218\uD3C9\uC774 \uB420 \uB54C\uAE4C\uC9C0 \uC549\uAE30. \uBB34\uB98E\uC774 \uBC1C\uB05D\uC744 \uB118\uC9C0 \uC54A\uAC8C. \uC77C\uC5B4\uC124 \uB54C \uC5C9\uB369\uC774\uC5D0 \uD798\uC8FC\uAE30.', anim: 'squat' },
+      { name: '\uD314\uAD7D\uD600\uD3B4\uAE30', target: '\uC0C1\uCCB4', desc: '\uC190\uC740 \uC5B4\uAE68\uBCF4\uB2E4 \uC0B4\uC9DD \uB113\uAC8C, \uBAB8\uC740 \uBA38\uB9AC\uBD80\uD130 \uBC1C\uB05D\uAE4C\uC9C0 \uC77C\uC9C1\uC120 \uC720\uC9C0. \uAC00\uC2B4\uC774 \uBC14\uB2E5\uC5D0 \uB2FF\uC744 \uB4EF \uB0B4\uB824\uAC14\uB2E4 \uBC00\uC5B4 \uC62C\uB9AC\uAE30. \uD798\uB4E4\uBA74 \uBB34\uB98E \uB300\uACE0 \uD574\uB3C4 OK.', anim: 'pushup' },
+      { name: '\uB9C8\uC6B4\uD2F4\uD074\uB77C\uC774\uBA38', target: '\uCF54\uC5B4+\uC804\uC2E0', desc: '\uD50C\uB7AD\uD06C \uC790\uC138\uC5D0\uC11C \uBB34\uB98E\uC744 \uAC00\uC2B4 \uCABD\uC73C\uB85C \uBE60\uB974\uAC8C \uBC88\uAC08\uC544 \uB2F9\uAE30\uAE30. \uC5C9\uB369\uC774\uAC00 \uC704\uB85C \uC62C\uB77C\uAC00\uC9C0 \uC54A\uAC8C \uCF54\uC5B4\uC5D0 \uD798 \uC720\uC9C0. \uD638\uD761\uC740 \uB04A\uC9C0 \uB9D0\uACE0.', anim: 'climber' },
+      { name: '\uBCF5\uADFC \uD06C\uB7F0\uCE58', target: '\uCF54\uC5B4', desc: '\uB4F1 \uB300\uACE0 \uB204\uC6CC \uBB34\uB98E 90\uB3C4 \uAD6C\uBD80\uB9AC\uAE30. \uC190\uC740 \uADC0 \uC606\uC5D0 \uAC00\uBCCD\uAC8C. \uC5B4\uAE68\uAC00 \uBC14\uB2E5\uC5D0\uC11C \uB5A8\uC5B4\uC9C8 \uC815\uB3C4\uB9CC \uC0C1\uCCB4 \uB4E4\uAE30. \uBAA9\uC5D0 \uD798 \uC8FC\uC9C0 \uB9D0\uACE0 \uBC30\uC5D0 \uC9D1\uC911.', anim: 'crunch' },
+      { name: '\uBC84\uD53C', target: '\uC804\uC2E0 (\uCD5C\uACE0\uAC15\uB3C4)', desc: '\uC11C\uAE30 \u2192 \uC2A4\uCFFC\uD2B8 \uC790\uC138\uB85C \uC190 \uC9DA\uAE30 \u2192 \uB2E4\uB9AC \uB4A4\uB85C \uCC28\uC11C \uD50C\uB7AD\uD06C \u2192 \uD314\uAD7D\uD600\uD3B4\uAE30 1\uD68C \u2192 \uB2E4\uB9AC \uB2F9\uACA8 \uC2A4\uCFFC\uD2B8 \u2192 \uC810\uD504. \uC26C\uC9C0 \uB9D0\uACE0 \uC5F0\uACB0 \uB3D9\uC791\uC73C\uB85C.', anim: 'burpee' },
+    ];
+    const DUMBBELL_EXERCISES = [
+      { name: '\uBC14\uC774\uC149 \uCEEC', target: '\uD314 \uC774\uB450\uADFC', sets: 3, reps: 12, rest: 45, desc: '\uD314\uAF48\uCE58\uB97C \uBAB8\uC5D0 \uACE0\uC815\uD558\uACE0, \uC544\uB839\uC744 \uC5B4\uAE68 \uB192\uC774\uAE4C\uC9C0 \uCC9C\uCC9C\uD788 \uB4E4\uC5B4 \uC62C\uB838\uB2E4 2\uCD08\uAC04 \uBC84\uD2F0\uACE0 \uB0B4\uB9AC\uAE30. \uBC18\uB3D9 \uC4F0\uC9C0 \uB9D0\uACE0 \uC774\uB450\uADFC\uC73C\uB85C\uB9CC.' },
+      { name: '\uC204\uB354 \uD504\uB808\uC2A4', target: '\uC5B4\uAE68', sets: 3, reps: 12, rest: 45, desc: '\uC544\uB839\uC744 \uADC0 \uB192\uC774\uC5D0\uC11C \uC2DC\uC791, \uBA38\uB9AC \uC704\uB85C \uBC00\uC5B4 \uC62C\uB9AC\uAE30. \uD314 \uC644\uC804\uD788 \uD3B4\uC9C0\uAE30 \uC9C1\uC804\uC5D0 \uBA48\uCD94\uACE0 \uB0B4\uB9AC\uAE30. \uD5C8\uB9AC \uC82F\uD788\uC9C0 \uC54A\uAC8C \uCF54\uC5B4\uC5D0 \uD798.' },
+      { name: '\uC0AC\uC774\uB4DC \uB808\uD130\uB7F4 \uB808\uC774\uC988', target: '\uC5B4\uAE68 \uCE21\uBA74', sets: 3, reps: 12, rest: 45, desc: '\uC544\uB839\uC744 \uBAB8 \uC606\uC5D0 \uB4E4\uACE0, \uD314\uC744 \uC0B4\uC9DD \uAD6C\uBD80\uB9B0 \uCC44 \uC5B4\uAE68 \uB192\uC774\uAE4C\uC9C0 \uC62C\uB9AC\uAE30. \uC62C\uB9B4 \uB54C 2\uCD08, \uB0B4\uB9B4 \uB54C 3\uCD08. \uC5B4\uAE68 \uC73C\uC4F1\uD558\uC9C0 \uC54A\uAC8C.' },
+    ];
+    const PLANK_DESC = '\uD314\uAF48\uCE58\uC640 \uBC1C\uB05D\uC73C\uB85C \uC9C0\uD0F1, \uBAB8 \uC804\uCCB4 \uC77C\uC9C1\uC120. \uC5C9\uB369\uC774\uAC00 \uC62C\uB77C\uAC00\uAC70\uB098 \uCC98\uC9C0\uC9C0 \uC54A\uAC8C. \uBC30\uC5D0 \uD798 \uC8FC\uACE0 \uD638\uD761\uC740 \uC790\uC5F0\uC2A4\uB7FD\uAC8C \uC720\uC9C0.';
+    const PLANK_SETS = 3;
+    const PLANK_DURATION = 60;
+    const PLANK_REST = 30;
+
+    function playBeep(freq = 880, dur = 100) {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = freq;
+        gain.gain.value = 0.3;
+        osc.start();
+        osc.stop(ctx.currentTime + dur / 1000);
+      } catch(e) {}
+    }
+    function playBeepHigh() { playBeep(1200, 80); }
+    function playBeepDone() { playBeep(660, 200); setTimeout(() => playBeep(880, 200), 250); }
+
+    /* ─── Stickman SVGs ─── */
+    function Stickman({ type, paused }) {
+      const cls = paused ? ' stick-paused' : '';
+      const common = { stroke: '#FF8C42', strokeWidth: 3, strokeLinecap: 'round', fill: 'none' };
+      const headProps = { cx: 60, cy: 18, r: 8, fill: '#FF8C42', stroke: 'none' };
+
+      if (type === 'squat') return (
+        <div className="wo-stickman">
+          <svg viewBox="0 0 120 120">
+            <circle {...headProps} />
+            <line x1="60" y1="26" x2="60" y2="58" {...common} />
+            <line x1="40" y1="42" x2="80" y2="42" {...common} />
+            <g className={`stick-squat${cls}`}>
+              <line x1="60" y1="58" x2="45" y2="85" {...common} />
+              <line x1="45" y1="85" x2="40" y2="110" {...common} />
+              <line x1="60" y1="58" x2="75" y2="85" {...common} />
+              <line x1="75" y1="85" x2="80" y2="110" {...common} />
+            </g>
+          </svg>
+        </div>
+      );
+      if (type === 'pushup') return (
+        <div className="wo-stickman">
+          <svg viewBox="0 0 120 120">
+            <g className={`stick-pushup${cls}`}>
+              <circle cx="25" cy="50" r="8" fill="#FF8C42" stroke="none" />
+              <line x1="33" y1="50" x2="75" y2="55" {...common} />
+              <line x1="25" y1="58" x2="25" y2="75" {...common} />
+              <line x1="25" y1="75" x2="20" y2="80" {...common} />
+            </g>
+            <line x1="75" y1="55" x2="95" y2="55" {...common} />
+            <line x1="95" y1="55" x2="95" y2="80" {...common} />
+          </svg>
+        </div>
+      );
+      if (type === 'climber') return (
+        <div className="wo-stickman">
+          <svg viewBox="0 0 120 120">
+            <circle cx="25" cy="40" r="8" fill="#FF8C42" stroke="none" />
+            <line x1="33" y1="40" x2="65" y2="50" {...common} />
+            <line x1="25" y1="48" x2="20" y2="62" {...common} />
+            <line x1="20" y1="62" x2="15" y2="68" {...common} />
+            <g className={`stick-climber${cls}`}>
+              <line x1="65" y1="50" x2="50" y2="75" {...common} />
+              <line x1="50" y1="75" x2="55" y2="95" {...common} />
+            </g>
+            <line x1="65" y1="50" x2="85" y2="65" {...common} />
+            <line x1="85" y1="65" x2="90" y2="85" {...common} />
+          </svg>
+        </div>
+      );
+      if (type === 'crunch') return (
+        <div className="wo-stickman">
+          <svg viewBox="0 0 120 120">
+            <line x1="30" y1="80" x2="90" y2="80" {...common} />
+            <g className={`stick-crunch${cls}`} style={{transformOrigin:'70px 80px'}}>
+              <circle cx="40" cy="55" r="8" fill="#FF8C42" stroke="none" />
+              <line x1="48" y1="58" x2="70" y2="75" {...common} />
+              <line x1="45" y1="65" x2="55" y2="55" {...common} />
+            </g>
+            <line x1="70" y1="80" x2="55" y2="105" {...common} />
+            <line x1="70" y1="80" x2="85" y2="105" {...common} />
+          </svg>
+        </div>
+      );
+      // burpee
+      return (
+        <div className="wo-stickman">
+          <svg viewBox="0 0 120 120">
+            <g className={`stick-burpee${cls}`}>
+              <circle {...headProps} />
+              <line x1="60" y1="26" x2="60" y2="58" {...common} />
+              <line x1="40" y1="42" x2="80" y2="42" {...common} />
+              <line x1="60" y1="58" x2="45" y2="85" {...common} />
+              <line x1="45" y1="85" x2="40" y2="110" {...common} />
+              <line x1="60" y1="58" x2="75" y2="85" {...common} />
+              <line x1="75" y1="85" x2="80" y2="110" {...common} />
+            </g>
+          </svg>
+        </div>
+      );
+    }
+
+    /* ─── Circular Timer ─── */
+    function CircularTimer({ seconds, total, color }) {
+      const r = 90;
+      const circ = 2 * Math.PI * r;
+      const pct = total > 0 ? seconds / total : 0;
+      const offset = circ * (1 - pct);
+      return (
+        <div className="wo-timer-ring">
+          <svg viewBox="0 0 200 200">
+            <circle className="wo-timer-bg" cx="100" cy="100" r={r} />
+            <circle className="wo-timer-fg" cx="100" cy="100" r={r}
+              stroke={color} strokeDasharray={circ} strokeDashoffset={offset} />
+          </svg>
+          <div className="wo-timer-center">
+            <div className="wo-timer-seconds">{seconds}</div>
+          </div>
+        </div>
+      );
+    }
+
+    /* ─── WorkoutPage ─── */
+    function WorkoutPage() {
+      const { isA } = getDayInfo();
+      const [woHistory] = useState(() => loadWorkoutHistory());
+      const [phase, setPhase] = useState('idle');
+      // idle | interval | intervalRest | roundRest | rest5min | dumbbell | dumbbellRest | plank | plankRest | done
+      const [timer, setTimer] = useState(0);
+      const [paused, setPaused] = useState(false);
+      const [round, setRound] = useState(0);
+      const [exIdx, setExIdx] = useState(0);
+      const [dbIdx, setDbIdx] = useState(0);
+      const [dbSet, setDbSet] = useState(0);
+      const [plankSet, setPlankSet] = useState(0);
+      const [totalTime, setTotalTime] = useState(0);
+      const timerRef = React.useRef(null);
+      const totalRef = React.useRef(0);
+      const phaseRef = React.useRef('idle');
+      const pausedRef = React.useRef(false);
+
+      useEffect(() => { phaseRef.current = phase; }, [phase]);
+      useEffect(() => { pausedRef.current = paused; }, [paused]);
+
+      const stopTick = useCallback(() => {
+        if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+      }, []);
+
+      useEffect(() => () => stopTick(), [stopTick]);
+
+      const startCountdown = useCallback((secs, onDone) => {
+        stopTick();
+        setTimer(secs);
+        let left = secs;
+        timerRef.current = setInterval(() => {
+          if (pausedRef.current) return;
+          left--;
+          totalRef.current++;
+          setTotalTime(totalRef.current);
+          setTimer(left);
+          if (left <= 3 && left > 0) playBeep(440, 60);
+          if (left <= 0) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+            playBeepHigh();
+            onDone();
+          }
+        }, 1000);
+      }, [stopTick]);
+
+      const advanceInterval = useCallback((r, e) => {
+        if (e < 4) {
+          // exercise phase
+          setPhase('interval'); setRound(r); setExIdx(e);
+          startCountdown(40, () => {
+            // rest 20s then next exercise
+            setPhase('intervalRest');
+            startCountdown(20, () => advanceInterval(r, e + 1));
+          });
+        } else {
+          // last exercise in round (index 4)
+          setPhase('interval'); setRound(r); setExIdx(e);
+          startCountdown(40, () => {
+            if (r < 2) {
+              // round rest 60s
+              setPhase('roundRest');
+              startCountdown(60, () => advanceInterval(r + 1, 0));
+            } else {
+              // interval done → 5min rest
+              playBeepDone();
+              setPhase('rest5min');
+              startCountdown(300, () => {
+                setPhase('dumbbell');
+                setDbIdx(0); setDbSet(0);
+              });
+            }
+          });
+        }
+      }, [startCountdown]);
+
+      const handleStart = useCallback(() => {
+        totalRef.current = 0; setTotalTime(0);
+        setPaused(false);
+        advanceInterval(0, 0);
+      }, [advanceInterval]);
+
+      const handlePause = useCallback(() => setPaused(true), []);
+      const handleResume = useCallback(() => setPaused(false), []);
+
+      // Dumbbell: set complete
+      const handleDbSetDone = useCallback(() => {
+        const ex = DUMBBELL_EXERCISES[dbIdx];
+        const nextSet = dbSet + 1;
+        if (nextSet >= ex.sets) {
+          // next exercise
+          const nextEx = dbIdx + 1;
+          if (nextEx >= DUMBBELL_EXERCISES.length) {
+            playBeepDone();
+            setPhase('plank'); setPlankSet(0);
+            startCountdown(PLANK_DURATION, () => {
+              if (0 + 1 < PLANK_SETS) {
+                setPhase('plankRest');
+                startCountdown(PLANK_REST, () => {
+                  setPlankSet(1);
+                  setPhase('plank');
+                  startCountdown(PLANK_DURATION, () => {
+                    setPhase('plankRest');
+                    startCountdown(PLANK_REST, () => {
+                      setPlankSet(2);
+                      setPhase('plank');
+                      startCountdown(PLANK_DURATION, () => finishWorkout());
+                    });
+                  });
+                });
+              }
+            });
+          } else {
+            setDbIdx(nextEx); setDbSet(0);
+            setPhase('dumbbellRest');
+            startCountdown(ex.rest, () => setPhase('dumbbell'));
+          }
+        } else {
+          setDbSet(nextSet);
+          setPhase('dumbbellRest');
+          startCountdown(ex.rest, () => setPhase('dumbbell'));
+        }
+      }, [dbIdx, dbSet, startCountdown]);
+
+      const startPlankSequence = useCallback((setNum) => {
+        setPlankSet(setNum);
+        setPhase('plank');
+        startCountdown(PLANK_DURATION, () => {
+          if (setNum + 1 < PLANK_SETS) {
+            setPhase('plankRest');
+            startCountdown(PLANK_REST, () => startPlankSequence(setNum + 1));
+          } else {
+            finishWorkout();
+          }
+        });
+      }, [startCountdown]);
+
+      const handleDbAllDone = useCallback(() => {
+        playBeepDone();
+        startPlankSequence(0);
+      }, [startPlankSequence]);
+
+      // Override handleDbSetDone to use startPlankSequence properly
+      const handleSetComplete = useCallback(() => {
+        const ex = DUMBBELL_EXERCISES[dbIdx];
+        const nextSet = dbSet + 1;
+        if (nextSet >= ex.sets) {
+          const nextEx = dbIdx + 1;
+          if (nextEx >= DUMBBELL_EXERCISES.length) {
+            handleDbAllDone();
+          } else {
+            setPhase('dumbbellRest');
+            startCountdown(ex.rest, () => {
+              setDbIdx(nextEx); setDbSet(0);
+              setPhase('dumbbell');
+            });
+          }
+        } else {
+          setPhase('dumbbellRest');
+          startCountdown(ex.rest, () => {
+            setDbSet(nextSet);
+            setPhase('dumbbell');
+          });
+        }
+      }, [dbIdx, dbSet, startCountdown, handleDbAllDone]);
+
+      const finishWorkout = useCallback(() => {
+        stopTick();
+        playBeepDone();
+        setPhase('done');
+        // save to localStorage
+        const d = new Date();
+        const key = `diet-workout-${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+        const record = { completed: true, totalTime: totalRef.current, kcal: 250 };
+        localStorage.setItem(key, JSON.stringify(record));
+        // auto-check home checklist items
+        const checks = loadChecks();
+        checks['b-m-4'] = true;
+        checks['b-m-5'] = true;
+        checks['b-m-6'] = true;
+        saveChecks(checks);
+      }, [stopTick]);
+
+      // Workout history section (reused in multiple views)
+      const woHistorySection = (
+        <HistorySection title={'\uD83D\uDCCB \uC6B4\uB3D9 \uAE30\uB85D'} count={woHistory.length}>
+          {woHistory.length === 0 ? (
+            <div className="hist-empty">{'\uC544\uC9C1 \uAE30\uB85D\uC774 \uC5C6\uC2B5\uB2C8\uB2E4'}</div>
+          ) : (
+            woHistory.map((r, i) => {
+              const mins = Math.floor(r.totalTime / 60);
+              const secs = r.totalTime % 60;
+              return (
+                <div className="hist-card" key={i}>
+                  <div className="hist-card-top">
+                    <span className="hist-date">{r.label}</span>
+                    <span className="hist-badge hist-badge-workout">{'\uC644\uB8CC'}</span>
+                  </div>
+                  <div className="hist-card-stats">
+                    <span className="hist-stat">{'\u23F1'} <b>{mins}{'\uBD84'} {secs}{'\uCD08'}</b></span>
+                    <span className="hist-stat">{'\uD83D\uDD25'} <b>{r.kcal}kcal</b></span>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </HistorySection>
+      );
+
+      // A-day view
+      if (isA) {
+        return (
+          <div className="wo-aday">
+            <div className="wo-aday-emoji">{'\uD83C\uDFC3'}</div>
+            <div className="wo-aday-text">{'\uC624\uB298\uC740 \uC870\uAE45\uC77C\uC785\uB2C8\uB2E4'}</div>
+            <button className="wo-aday-btn" onClick={() => {
+              document.querySelectorAll('.nav-item')[1]?.click();
+            }}>{'\uB7EC\uB2DD \uD0ED\uC73C\uB85C \uC774\uB3D9'}</button>
+            <div style={{width:'100%',marginTop:16}}>{woHistorySection}</div>
+          </div>
+        );
+      }
+
+      // Done view
+      if (phase === 'done') {
+        const mins = Math.floor(totalTime / 60);
+        const secs = totalTime % 60;
+        return (
+          <div className="wo-wrap">
+            <div className="wo-done-card">
+              <div className="wo-done-emoji">{'\uD83C\uDF89'}</div>
+              <div className="wo-done-title">{'\uC624\uB298 \uC6B4\uB3D9 \uC644\uB8CC! \uC218\uACE0\uD588\uC5B4!'}</div>
+              <div className="wo-done-row">
+                <span className="wo-done-label">{'\uCD1D \uC18C\uC694\uC2DC\uAC04'}</span>
+                <span className="wo-done-value">{mins}{'\uBD84'} {secs}{'\uCD08'}</span>
+              </div>
+              <div className="wo-done-row">
+                <span className="wo-done-label">{'\uB9E8\uBAAC \uC778\uD130\uBC8C'}</span>
+                <span className="wo-done-value">170 kcal</span>
+              </div>
+              <div className="wo-done-row">
+                <span className="wo-done-label">{'\uC544\uB839 \uC6B4\uB3D9'}</span>
+                <span className="wo-done-value">60 kcal</span>
+              </div>
+              <div className="wo-done-row">
+                <span className="wo-done-label">{'\uD50C\uB7AD\uD06C'}</span>
+                <span className="wo-done-value">20 kcal</span>
+              </div>
+              <div className="wo-done-row">
+                <span className="wo-done-label">{'\uD83D\uDD25 \uCD1D \uC18C\uBAA8 \uCE7C\uB85C\uB9AC'}</span>
+                <span className="wo-done-value" style={{color:'var(--primary)'}}>250 kcal</span>
+              </div>
+            </div>
+            {woHistorySection}
+          </div>
+        );
+      }
+
+      // Idle view
+      if (phase === 'idle') {
+        return (
+          <div className="wo-wrap">
+            <div className="page-title" style={{marginBottom:8}}>{'\uD83D\uDCAA'} {'\uB9E8\uBAAC \uC778\uD130\uBC8C'}</div>
+            <div className="page-subtitle" style={{marginBottom:32}}>{'\uC624\uB298\uC758 B\uC77C \uC6B4\uB3D9\uC744 \uC2DC\uC791\uD558\uC138\uC694'}</div>
+            <button className="wo-btn wo-btn-start pulse" onClick={handleStart}>START</button>
+            <div style={{width:'100%',marginTop:16}}>{woHistorySection}</div>
+          </div>
+        );
+      }
+
+      // Dumbbell phase
+      if (phase === 'dumbbell' || phase === 'dumbbellRest') {
+        const ex = DUMBBELL_EXERCISES[dbIdx];
+        return (
+          <div className="wo-wrap wo-rest">
+            <div className="wo-phase-label">{'\uC544\uB839 \uC6B4\uB3D9'} {dbIdx + 1}/{DUMBBELL_EXERCISES.length}</div>
+            <div className="wo-set-card">
+              <div className="wo-set-title">{ex.name}</div>
+              <div className="wo-set-subtitle">{ex.target} | {ex.sets}{'\uC138\uD2B8'} x {ex.reps}{'\uD68C'}</div>
+              {ex.desc && <div className="wo-exercise-desc" style={{textAlign:'left',margin:'0 0 12px',maxWidth:'100%'}}>{ex.desc}</div>}
+              <div className="wo-set-progress">
+                {Array.from({length: ex.sets}, (_, i) => (
+                  <div key={i} className={`wo-set-dot${i < dbSet ? ' done' : i === dbSet ? ' current' : ''}`}>
+                    {i < dbSet ? '\u2713' : i + 1}
+                  </div>
+                ))}
+              </div>
+              {phase === 'dumbbellRest' ? (
+                <div className="wo-set-rest">{'\uD734\uC2DD'} {timer}{'\uCD08'}</div>
+              ) : (
+                <button className="wo-set-btn" onClick={handleSetComplete}>
+                  {dbSet + 1}{'\uC138\uD2B8 \uC644\uB8CC'} ({ex.reps}{'\uD68C'})
+                </button>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      // Plank phase
+      if (phase === 'plank' || phase === 'plankRest') {
+        return (
+          <div className={`wo-wrap ${phase === 'plank' ? 'wo-exercise' : 'wo-rest'}`}>
+            <div className="wo-phase-label">{'\uD50C\uB7AD\uD06C \uB9C8\uBB34\uB9AC'}</div>
+            <div className="wo-round">{'\uC138\uD2B8'} {plankSet + 1}/{PLANK_SETS}</div>
+            <CircularTimer
+              seconds={timer}
+              total={phase === 'plank' ? PLANK_DURATION : PLANK_REST}
+              color={phase === 'plank' ? 'var(--danger)' : 'var(--blue)'}
+            />
+            <div className="wo-timer-status" style={{fontSize:16,fontWeight:700,color: phase==='plank'?'var(--danger)':'var(--blue)'}}>
+              {phase === 'plank' ? '\uD50C\uB7AD\uD06C \uC720\uC9C0' : '\uD734\uC2DD \uC911'}
+            </div>
+            {phase === 'plank' && <div className="wo-exercise-desc" style={{marginTop:12}}>{PLANK_DESC}</div>}
+          </div>
+        );
+      }
+
+      // 5min rest
+      if (phase === 'rest5min') {
+        const m = Math.floor(timer / 60);
+        const s = timer % 60;
+        return (
+          <div className="wo-wrap wo-rest">
+            <div className="wo-phase-label">{'\uC778\uD130\uBC8C \uC644\uB8CC!'}</div>
+            <CircularTimer seconds={timer} total={300} color="var(--blue)" />
+            <div className="wo-exercise-name" style={{color:'var(--blue)'}}>{m}:{String(s).padStart(2,'0')}</div>
+            <div className="wo-exercise-desc">{'\uD734\uC2DD \uD6C4 \uC544\uB839 \uC6B4\uB3D9\uC774 \uC2DC\uC791\uB429\uB2C8\uB2E4'}</div>
+          </div>
+        );
+      }
+
+      // Interval / intervalRest / roundRest phases
+      const ex = INTERVAL_EXERCISES[exIdx] || INTERVAL_EXERCISES[0];
+      const isExercise = phase === 'interval';
+      const isRoundRest = phase === 'roundRest';
+      const timerTotal = isExercise ? 40 : isRoundRest ? 60 : 20;
+      const timerColor = isExercise ? 'var(--danger)' : 'var(--blue)';
+      const bgClass = isExercise ? 'wo-exercise' : 'wo-rest';
+      const nextEx = isExercise && exIdx < 4 ? INTERVAL_EXERCISES[exIdx + 1] : null;
+
+      return (
+        <div className={`wo-wrap ${bgClass}`}>
+          <div className="wo-phase-label">{'\uB9E8\uBAAC \uC778\uD130\uBC8C'}</div>
+          <div className="wo-round">{'\uB77C\uC6B4\uB4DC'} {round + 1}/3</div>
+
+          <div className="round-lanes" style={{width:'100%'}}>
+            {[0,1,2].map(i => (
+              <div key={i} className={`round-lane${i < round ? ' done' : i === round ? ' active' : ''}`} />
+            ))}
+          </div>
+
+          {isExercise && <Stickman type={ex.anim} paused={paused} />}
+
+          <CircularTimer seconds={timer} total={timerTotal} color={timerColor} />
+
+          <div className="wo-exercise-name">
+            {isRoundRest ? '\uB77C\uC6B4\uB4DC \uD734\uC2DD' : ex.name}
+          </div>
+          {!isRoundRest && <div className="wo-exercise-target">{ex.target}</div>}
+          <div className={`wo-timer-status ${isExercise ? 'exercise' : 'rest'}`}>
+            {isExercise ? '\uC6B4\uB3D9 \uC911' : '\uD734\uC2DD \uC911'}
+          </div>
+          {isExercise && <div className="wo-exercise-desc">{ex.desc}</div>}
+          {nextEx && <div className="wo-next-preview">{'\uB2E4\uC74C: '}{nextEx.name} ({nextEx.target})</div>}
+
+          <div className="wo-controls">
+            {paused ? (
+              <button className="wo-btn wo-btn-resume" onClick={handleResume}>GO</button>
+            ) : (
+              <button className="wo-btn wo-btn-pause" onClick={handlePause}>PAUSE</button>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    /* ─── Diet data & helpers ─── */
+    const FOOD_PRESETS = [
+      { name: '\uACE0\uAD6C\uB9C8 1\uAC1C', kcal: 130, protein: 2 },
+      { name: '\uC0B6\uC740 \uB2EC\uAC78 1\uAC1C', kcal: 80, protein: 7 },
+      { name: '\uADF8\uB9AD\uC694\uAC70\uD2B8 1\uCEF5', kcal: 130, protein: 15 },
+      { name: '\uBE14\uB8E8\uBCA0\uB9AC \uD55C\uC904', kcal: 40, protein: 0.5 },
+      { name: '\uACAC\uACFC\uB958 10\uC54C', kcal: 90, protein: 3 },
+      { name: '\uB450\uBD80 \uBC18\uBAA8 150g', kcal: 120, protein: 12 },
+      { name: '\uBAA9\uC0B4 200g', kcal: 460, protein: 36 },
+      { name: '\uB2ED\uAC00\uC2B4\uC0B4 200g', kcal: 220, protein: 46 },
+      { name: '\uC0BC\uAC81\uC0B4 200g', kcal: 560, protein: 28 },
+      { name: '\uBC14\uB098\uB098 1\uAC1C', kcal: 93, protein: 1 },
+      { name: '\uC591\uBC30\uCD94 100g', kcal: 25, protein: 1.5 },
+      { name: '\uBC25 1\uACF5\uAE30', kcal: 300, protein: 5 },
+      { name: '\uBE0C\uB85C\uCF5C\uB9AC 100g', kcal: 35, protein: 3 },
+    ];
+
+    const DEFAULT_MEALS = {
+      lunch: [
+        { id: 'dl-1', name: '\uACE0\uAD6C\uB9C8 1\uAC1C', kcal: 130, protein: 2 },
+        { id: 'dl-2', name: '\uC0B6\uC740 \uB2EC\uAC78 3\uAC1C', kcal: 240, protein: 21 },
+        { id: 'dl-3', name: '\uADF8\uB9AD\uC694\uAC70\uD2B8 1\uCEF5', kcal: 130, protein: 15 },
+        { id: 'dl-4', name: '\uBE14\uB8E8\uBCA0\uB9AC \uD55C\uC904', kcal: 40, protein: 0.5 },
+        { id: 'dl-5', name: '\uACAC\uACFC\uB958 10\uC54C', kcal: 90, protein: 3 },
+        { id: 'dl-6', name: '\uB450\uBD80 \uBC18\uBAA8', kcal: 120, protein: 12 },
+      ],
+      dinner_mok: [
+        { id: 'dd-1', name: '\uBAA9\uC0B4 200g', kcal: 460, protein: 36 },
+        { id: 'dd-2', name: '\uC591\uBC30\uCD94 100g', kcal: 25, protein: 1.5 },
+        { id: 'dd-3', name: '\uACE0\uAD6C\uB9C8 1\uAC1C', kcal: 130, protein: 2 },
+      ],
+      dinner_dak: [
+        { id: 'dd-1', name: '\uB2ED\uAC00\uC2B4\uC0B4 200g', kcal: 220, protein: 46 },
+        { id: 'dd-2', name: '\uC591\uBC30\uCD94 100g', kcal: 25, protein: 1.5 },
+        { id: 'dd-3', name: '\uACE0\uAD6C\uB9C8 1\uAC1C', kcal: 130, protein: 2 },
+      ],
+      snack: [
+        { id: 'ds-1', name: '\uBC14\uB098\uB098 1\uAC1C (\uC6B4\uB3D9 \uC804)', kcal: 93, protein: 1 },
+      ],
+    };
+    const MEAL_SECTIONS = [
+      { key: 'lunch', label: '\uC810\uC2EC', icon: '\u2600\uFE0F' },
+      { key: 'dinner', label: '\uC800\uB141', icon: '\uD83C\uDF19' },
+      { key: 'snack', label: '\uAC04\uC2DD', icon: '\uD83C\uDF6A' },
+    ];
+    const SETTINGS_DEFAULTS = {
+      height: 173, weight: 71, age: 22,
+      goalWeight: 67, goalDate: '2026-06-01',
+      goalKcal: 2200, goalProtein: 130,
+      startDate: '2026-03-30',
+      manualDayOverride: false,
+      alarms: {
+        workout: { time: '09:30', on: true },
+        lunch: { time: '12:00', on: true },
+        dinner: { time: '18:00', on: true },
+        walk: { time: '19:30', on: true },
+      },
+    };
+    function loadSettings() {
+      try {
+        const s = JSON.parse(localStorage.getItem('diet-settings'));
+        return { ...SETTINGS_DEFAULTS, ...s, alarms: { ...SETTINGS_DEFAULTS.alarms, ...(s?.alarms || {}) } };
+      } catch { return { ...SETTINGS_DEFAULTS }; }
+    }
+    function saveSettings(s) { localStorage.setItem('diet-settings', JSON.stringify(s)); }
+    function getDietGoals() {
+      const s = loadSettings();
+      return { kcal: s.goalKcal || 2200, protein: s.goalProtein || 130 };
+    }
+    const DIET_GOALS_REF = { current: getDietGoals() };
+    function DIET_GOALS_get() { return DIET_GOALS_REF.current; }
+    // Keep backward compat
+    const DIET_GOALS = { get kcal() { return getDietGoals().kcal; }, get protein() { return getDietGoals().protein; } };
+
+    function getDietKey() {
+      const d = new Date();
+      return `diet-v2-${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+    }
+    function loadDiet() {
+      try { return JSON.parse(localStorage.getItem(getDietKey())) || {}; }
+      catch { return {}; }
+    }
+    function saveDiet(data) {
+      localStorage.setItem(getDietKey(), JSON.stringify(data));
+    }
+    function progColor(current, goal) {
+      const r = current / goal;
+      if (r > 1) return 'var(--danger)';
+      if (r > 0.85) return 'var(--energy)';
+      return 'var(--primary)';
+    }
+
+    function DietPage() {
+      const [dietData, setDietData] = useState(loadDiet);
+      const [meatType, setMeatType] = useState(() => dietData.meatType || 'mok'); // mok | dak
+      const [modal, setModal] = useState(null);
+      const [selected, setSelected] = useState(null);
+      const [search, setSearch] = useState('');
+      const [custom, setCustom] = useState({ name: '', kcal: '', protein: '' });
+
+      const checked = dietData.checked || {};
+      const extras = dietData.extras || { lunch: [], dinner: [], snack: [] };
+
+      const dinnerKey = meatType === 'dak' ? 'dinner_dak' : 'dinner_mok';
+
+      // All items per section (defaults + extras)
+      const getItems = (sectionKey) => {
+        const defaultKey = sectionKey === 'dinner' ? dinnerKey : sectionKey;
+        const defaults = (DEFAULT_MEALS[defaultKey] || []).map(f => ({ ...f, isDefault: true }));
+        const extra = (extras[sectionKey] || []).map(f => ({ ...f, isDefault: false }));
+        return [...defaults, ...extra];
+      };
+
+      // Totals: only checked items
+      const calcCheckedTotals = () => {
+        let kcal = 0, protein = 0;
+        MEAL_SECTIONS.forEach(sec => {
+          getItems(sec.key).forEach(f => {
+            const fid = f.id || f.name;
+            if (checked[sec.key + '-' + fid]) {
+              const q = f.qty || 1;
+              kcal += f.kcal * q;
+              protein += f.protein * q;
+            }
+          });
+        });
+        return { kcal: Math.round(kcal), protein: Math.round(protein * 10) / 10 };
+      };
+      const totals = calcCheckedTotals();
+
+      const save = useCallback((newData) => {
+        setDietData(newData);
+        saveDiet(newData);
+      }, []);
+
+      const toggleCheck = useCallback((sectionKey, foodId) => {
+        setDietData(prev => {
+          const ck = { ...(prev.checked || {}) };
+          const key = sectionKey + '-' + foodId;
+          ck[key] = !ck[key];
+          const next = { ...prev, checked: ck };
+          saveDiet(next);
+          return next;
+        });
+      }, []);
+
+      const switchMeat = useCallback((type) => {
+        setMeatType(type);
+        setDietData(prev => {
+          const next = { ...prev, meatType: type };
+          saveDiet(next);
+          return next;
+        });
+      }, []);
+
+      // Modal handlers
+      const openModal = useCallback((slot) => {
+        setModal({ slot });
+        setSelected(null);
+        setSearch('');
+        setCustom({ name: '', kcal: '', protein: '' });
+      }, []);
+      const closeModal = useCallback(() => { setModal(null); setSelected(null); }, []);
+
+      const confirmAdd = useCallback(() => {
+        if (!modal || !selected) return;
+        const entry = { ...selected.food, qty: selected.qty, id: 'x-' + Date.now() };
+        setDietData(prev => {
+          const ex = { ...(prev.extras || { lunch: [], dinner: [], snack: [] }) };
+          ex[modal.slot] = [...(ex[modal.slot] || []), entry];
+          const next = { ...prev, extras: ex };
+          saveDiet(next);
+          return next;
+        });
+        closeModal();
+      }, [modal, selected, closeModal]);
+
+      const addCustom = useCallback(() => {
+        if (!modal || !custom.name || !custom.kcal) return;
+        const entry = {
+          name: custom.name, kcal: parseFloat(custom.kcal) || 0,
+          protein: parseFloat(custom.protein) || 0, qty: 1, id: 'x-' + Date.now(),
+        };
+        setDietData(prev => {
+          const ex = { ...(prev.extras || { lunch: [], dinner: [], snack: [] }) };
+          ex[modal.slot] = [...(ex[modal.slot] || []), entry];
+          const next = { ...prev, extras: ex };
+          saveDiet(next);
+          return next;
+        });
+        closeModal();
+      }, [modal, custom, closeModal]);
+
+      const removeExtra = useCallback((slot, id) => {
+        setDietData(prev => {
+          const ex = { ...(prev.extras || { lunch: [], dinner: [], snack: [] }) };
+          ex[slot] = (ex[slot] || []).filter(f => f.id !== id);
+          const next = { ...prev, extras: ex };
+          saveDiet(next);
+          return next;
+        });
+      }, []);
+
+      const filtered = FOOD_PRESETS.filter(f =>
+        !search || f.name.toLowerCase().includes(search.toLowerCase())
+      );
+
+      const checkIcon = (
+        <svg viewBox="0 0 24 24" style={{width:12,height:12,fill:'var(--text-inv)'}}><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+      );
+
+      return (
+        <div>
+          {/* Summary */}
+          <div className="diet-summary">
+            <div className="diet-summary-row">
+              <span className="diet-summary-label">{'\uD83D\uDD25'} {'\uCE7C\uB85C\uB9AC'}</span>
+              <span className="diet-summary-nums">{totals.kcal.toLocaleString()} / {DIET_GOALS.kcal.toLocaleString()} kcal</span>
+            </div>
+            <div className="track-progress">
+              <div className="track-fill" style={{
+                width: `${Math.min(100, (totals.kcal / DIET_GOALS.kcal) * 100)}%`,
+                background: progColor(totals.kcal, DIET_GOALS.kcal),
+              }} />
+              <span className="track-runner" style={{left:`${Math.min(95, (totals.kcal / DIET_GOALS.kcal) * 100)}%`}}>{'\uD83C\uDFC3'}</span>
+            </div>
+            <div className="diet-summary-row" style={{marginTop:14}}>
+              <span className="diet-summary-label">{'\uD83E\uDD69'} {'\uB2E8\uBC31\uC9C8'}</span>
+              <span className="diet-summary-nums">{totals.protein}g / {DIET_GOALS.protein}g</span>
+            </div>
+            <div className="track-progress">
+              <div className="track-fill" style={{
+                width: `${Math.min(100, (totals.protein / DIET_GOALS.protein) * 100)}%`,
+                background: progColor(totals.protein, DIET_GOALS.protein),
+              }} />
+              <span className="track-runner" style={{left:`${Math.min(95, (totals.protein / DIET_GOALS.protein) * 100)}%`}}>{'\uD83C\uDFC3'}</span>
+            </div>
+          </div>
+
+          {/* Meal sections */}
+          {MEAL_SECTIONS.map(sec => {
+            const items = getItems(sec.key);
+            const secChecked = items.filter(f => checked[sec.key + '-' + (f.id || f.name)]);
+            const slotKcal = secChecked.reduce((s, f) => s + f.kcal * (f.qty || 1), 0);
+            const slotProt = secChecked.reduce((s, f) => s + f.protein * (f.qty || 1), 0);
+
+            return (
+              <div className="meal-section" key={sec.key}>
+                <div className="meal-header">
+                  <div>
+                    <span className="meal-title">{sec.icon} {sec.label}</span>
+                    <span className="meal-subtotal"> {Math.round(slotKcal)}kcal / {Math.round(slotProt*10)/10}g</span>
+                  </div>
+                  <button className="meal-add-btn" onClick={() => openModal(sec.key)}>+</button>
+                </div>
+
+                {/* Dinner meat switcher */}
+                {sec.key === 'dinner' && (
+                  <div style={{display:'flex',gap:8,marginBottom:12}}>
+                    <button onClick={() => switchMeat('mok')} style={{
+                      flex:1, padding:'8px 0', border:'1px solid', borderRadius:8, cursor:'pointer',
+                      borderColor: meatType==='mok' ? 'var(--primary)' : 'var(--check-unchecked)',
+                      background: meatType==='mok' ? 'var(--primary-bg)' : 'transparent',
+                      color: meatType==='mok' ? 'var(--primary)' : 'var(--sub2)', fontSize:13, fontWeight:600,
+                    }}>{'\uBAA9\uC0B4'}</button>
+                    <button onClick={() => switchMeat('dak')} style={{
+                      flex:1, padding:'8px 0', border:'1px solid', borderRadius:8, cursor:'pointer',
+                      borderColor: meatType==='dak' ? 'var(--primary)' : 'var(--check-unchecked)',
+                      background: meatType==='dak' ? 'var(--primary-bg)' : 'transparent',
+                      color: meatType==='dak' ? 'var(--primary)' : 'var(--sub2)', fontSize:13, fontWeight:600,
+                    }}>{'\uB2ED\uAC00\uC2B4\uC0B4'}</button>
+                  </div>
+                )}
+
+                {items.map(f => {
+                  const fid = f.id || f.name;
+                  const ck = !!checked[sec.key + '-' + fid];
+                  const q = f.qty || 1;
+                  return (
+                    <div key={fid} style={{display:'flex',alignItems:'center',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
+                      <div
+                        onClick={() => toggleCheck(sec.key, fid)}
+                        style={{
+                          width:22, height:22, minWidth:22, borderRadius:5, marginRight:12, cursor:'pointer',
+                          border: ck ? 'none' : '2px solid var(--check-unchecked)',
+                          background: ck ? 'var(--success)' : 'transparent',
+                          display:'flex', alignItems:'center', justifyContent:'center',
+                        }}
+                      >{ck && checkIcon}</div>
+                      <div style={{flex:1}}>
+                        <div style={{fontSize:14, color: ck ? 'var(--text)' : 'var(--sub2)'}}>
+                          {f.name}{q > 1 && <span style={{color:'var(--primary)',fontWeight:600,marginLeft:6}}>{'\u00D7'}{q}</span>}
+                        </div>
+                      </div>
+                      <div style={{textAlign:'right',marginLeft:8}}>
+                        <div style={{fontSize:12, color: ck ? 'var(--sub)' : 'var(--sub2)'}}>{Math.round(f.kcal * q)}kcal</div>
+                        <div style={{fontSize:11, color: ck ? 'var(--sub2)' : 'var(--sub2)'}}>{Math.round(f.protein * q * 10)/10}g</div>
+                      </div>
+                      {!f.isDefault && (
+                        <button className="food-del-btn" onClick={() => removeExtra(sec.key, f.id)} style={{marginLeft:4}}>{'\u00D7'}</button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+
+          {/* Modal */}
+          {modal && (
+            <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) closeModal(); }}>
+              <div className="modal-content">
+                <div className="modal-header">
+                  <div className="modal-title">{'\uC74C\uC2DD \uCD94\uAC00'}</div>
+                  <button className="modal-close" onClick={closeModal}>{'\u00D7'}</button>
+                </div>
+                {selected ? (
+                  <div>
+                    <div style={{textAlign:'center',marginBottom:8}}>
+                      <div style={{fontSize:18,fontWeight:700,color:'var(--text)'}}>{selected.food.name}</div>
+                      <div style={{fontSize:13,color:'var(--sub)',marginTop:4}}>
+                        {selected.food.kcal}kcal | {selected.food.protein}g {'\uB2E8\uBC31\uC9C8'} ({'\uAC1C\uB2F9'})
+                      </div>
+                    </div>
+                    <div className="qty-row">
+                      <button className="qty-btn" onClick={() => setSelected(p => ({...p, qty: Math.max(1, p.qty - 1)}))}>-</button>
+                      <span className="qty-num">{selected.qty}</span>
+                      <button className="qty-btn" onClick={() => setSelected(p => ({...p, qty: p.qty + 1}))}>+</button>
+                    </div>
+                    <div style={{textAlign:'center',fontSize:14,color:'var(--sub)',marginBottom:16}}>
+                      {'\uCD1D'} {Math.round(selected.food.kcal * selected.qty)}kcal / {Math.round(selected.food.protein * selected.qty * 10)/10}g
+                    </div>
+                    <button className="qty-confirm" onClick={confirmAdd}>{'\uCD94\uAC00\uD558\uAE30'}</button>
+                  </div>
+                ) : (
+                  <div>
+                    <input className="modal-search" placeholder={'\uC74C\uC2DD \uAC80\uC0C9...'} value={search}
+                      onChange={e => setSearch(e.target.value)} autoFocus />
+                    <div className="food-grid">
+                      {filtered.map((f, i) => (
+                        <div className="food-preset" key={i} onClick={() => setSelected({ food: f, qty: 1 })}>
+                          <div className="food-preset-name">{f.name}</div>
+                          <div className="food-preset-info">{f.kcal}kcal | {f.protein}g</div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="custom-form">
+                      <div className="custom-form-title">{'\uC9C1\uC811 \uC785\uB825'}</div>
+                      <div className="custom-form-row">
+                        <input className="custom-input" placeholder={'\uC74C\uC2DD \uC774\uB984'}
+                          value={custom.name} onChange={e => setCustom(p => ({...p, name: e.target.value}))} />
+                      </div>
+                      <div className="custom-form-row">
+                        <input className="custom-input" placeholder="kcal" type="number" inputMode="numeric"
+                          value={custom.kcal} onChange={e => setCustom(p => ({...p, kcal: e.target.value}))} />
+                        <input className="custom-input" placeholder={'\uB2E8\uBC31\uC9C8(g)'} type="number" inputMode="decimal"
+                          value={custom.protein} onChange={e => setCustom(p => ({...p, protein: e.target.value}))} />
+                      </div>
+                      <button className="custom-submit" disabled={!custom.name || !custom.kcal} onClick={addCustom}>
+                        {'\uC9C1\uC811 \uCD94\uAC00'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function SettingsPage() {
+      const [settings, setSettings] = useState(loadSettings);
+      const [saved, setSaved] = useState(false);
+      const [theme, setTheme] = useState(() => document.documentElement.dataset.theme || 'light');
+
+      const toggleTheme = useCallback(() => {
+        const next = theme === 'dark' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = next;
+        localStorage.setItem('diet-theme', next);
+        setTheme(next);
+      }, [theme]);
+
+      const update = useCallback((key, val) => {
+        setSettings(prev => {
+          const next = { ...prev, [key]: val };
+          saveSettings(next);
+          // sync legacy keys
+          if (key === 'weight') localStorage.setItem('diet-weight', String(val));
+          if (key === 'startDate') setStartDate(val);
+          return next;
+        });
+        setSaved(true);
+        setTimeout(() => setSaved(false), 1500);
+      }, []);
+
+      const updateAlarm = useCallback((alarmKey, field, val) => {
+        setSettings(prev => {
+          const alarms = { ...prev.alarms, [alarmKey]: { ...prev.alarms[alarmKey], [field]: val } };
+          const next = { ...prev, alarms };
+          saveSettings(next);
+          return next;
+        });
+      }, []);
+
+      const requestNotif = useCallback(() => {
+        if ('Notification' in window) {
+          Notification.requestPermission();
+        }
+      }, []);
+
+      const handleReset = useCallback(() => {
+        if (confirm('\uBAA8\uB4E0 \uB370\uC774\uD130\uB97C \uCD08\uAE30\uD654\uD558\uC2DC\uACA0\uC2B5\uB2C8\uAE4C? \uC774 \uC791\uC5C5\uC740 \uB418\uB3CC\uB9B4 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4.')) {
+          localStorage.clear();
+          window.location.reload();
+        }
+      }, []);
+
+      const { isA, dayNumber } = getDayInfo();
+
+      // Goal calculations
+      const today = new Date();
+      const goalD = new Date(settings.goalDate + 'T00:00:00');
+      const daysLeft = Math.max(0, Math.ceil((goalD - today) / (1000*60*60*24)));
+      const weightToLose = Math.max(0, settings.weight - settings.goalWeight);
+      const weeksLeft = Math.max(1, daysLeft / 7);
+      const weeklyRate = (weightToLose / weeksLeft).toFixed(2);
+
+      const alarmList = [
+        { key: 'workout', label: '\uC6B4\uB3D9 \uC2DC\uC791' },
+        { key: 'lunch', label: '\uC810\uC2EC \uC2DD\uC0AC' },
+        { key: 'dinner', label: '\uC800\uB141 \uC2DD\uC0AC' },
+        { key: 'walk', label: '\uC800\uB141 \uC0B0\uCC45' },
+      ];
+
+      return (
+        <div>
+          <div className="page-title">{'\u2699\uFE0F'} {'\uC124\uC815'}</div>
+          {saved && <span className="settings-saved">{'\u2713'} {'\uC800\uC7A5\uB428'}</span>}
+
+          {/* Dark mode */}
+          <div className="settings-card" style={{marginTop:20}}>
+            <div className="settings-row">
+              <span className="settings-row-label">{theme === 'dark' ? '\uD83C\uDF19' : '\u2600\uFE0F'} {'\uB2E4\uD06C \uBAA8\uB4DC'}</span>
+              <button className={`toggle${theme === 'dark' ? ' on' : ''}`} onClick={toggleTheme}>
+                <div className="toggle-knob" />
+              </button>
+            </div>
+          </div>
+
+          {/* Profile */}
+          <div className="settings-card">
+            <div className="settings-card-title">{'\uD83D\uDC64'} {'\uD504\uB85C\uD544'}</div>
+            <div className="settings-row">
+              <span className="settings-row-label">{'\uD0A4'} (cm)</span>
+              <input className="settings-row-input" type="number" inputMode="numeric"
+                value={settings.height} onChange={e => update('height', parseFloat(e.target.value) || 0)} />
+            </div>
+            <div className="settings-row">
+              <span className="settings-row-label">{'\uD604\uC7AC \uCCB4\uC911'} (kg)</span>
+              <input className="settings-row-input" type="number" inputMode="decimal" step="0.1"
+                value={settings.weight} onChange={e => update('weight', parseFloat(e.target.value) || 0)} />
+            </div>
+            <div className="settings-row">
+              <span className="settings-row-label">{'\uB098\uC774'}</span>
+              <input className="settings-row-input" type="number" inputMode="numeric"
+                value={settings.age} onChange={e => update('age', parseInt(e.target.value) || 0)} />
+            </div>
+          </div>
+
+          {/* Goals */}
+          <div className="settings-card">
+            <div className="settings-card-title">{'\uD83C\uDFAF'} {'\uBAA9\uD45C'}</div>
+            <div className="settings-row">
+              <span className="settings-row-label">{'\uBAA9\uD45C \uCCB4\uC911'} (kg)</span>
+              <input className="settings-row-input" type="number" inputMode="decimal" step="0.1"
+                value={settings.goalWeight} onChange={e => update('goalWeight', parseFloat(e.target.value) || 0)} />
+            </div>
+            <div className="settings-row">
+              <span className="settings-row-label">{'\uBAA9\uD45C \uB0A0\uC9DC'}</span>
+              <input className="settings-row-input" type="date" style={{width:145}}
+                value={settings.goalDate} onChange={e => update('goalDate', e.target.value)} />
+            </div>
+            <div className="settings-row">
+              <span className="settings-row-label">{'\uB0A8\uC740 \uC77C\uC218'}</span>
+              <span className="settings-row-value">D-{daysLeft}</span>
+            </div>
+            <div className="settings-row">
+              <span className="settings-row-label">{'\uC8FC\uB2F9 \uC608\uC0C1 \uAC10\uB7C9'}</span>
+              <span className="settings-row-value">{'\uC8FC'} {weeklyRate}kg</span>
+            </div>
+          </div>
+
+          {/* Daily targets */}
+          <div className="settings-card">
+            <div className="settings-card-title">{'\uD83D\uDCCA'} {'\uC77C\uC77C \uBAA9\uD45C'}</div>
+            <div className="settings-row">
+              <span className="settings-row-label">{'\uBAA9\uD45C \uCE7C\uB85C\uB9AC'} (kcal)</span>
+              <input className="settings-row-input" type="number" inputMode="numeric"
+                value={settings.goalKcal} onChange={e => update('goalKcal', parseInt(e.target.value) || 0)} />
+            </div>
+            <div className="settings-row">
+              <span className="settings-row-label">{'\uBAA9\uD45C \uB2E8\uBC31\uC9C8'} (g)</span>
+              <input className="settings-row-input" type="number" inputMode="numeric"
+                value={settings.goalProtein} onChange={e => update('goalProtein', parseInt(e.target.value) || 0)} />
+            </div>
+            <div className="settings-hint">{'\uC2DD\uB2E8 \uD0ED \uD504\uB85C\uADF8\uB808\uC2A4 \uBC14\uC5D0 \uBC18\uC601\uB429\uB2C8\uB2E4'}</div>
+          </div>
+
+          {/* Routine */}
+          <div className="settings-card">
+            <div className="settings-card-title">{'\uD83D\uDD04'} {'\uB8E8\uD2F4 \uC124\uC815'}</div>
+            <div className="settings-row">
+              <span className="settings-row-label">A/B {'\uC2DC\uC791 \uAE30\uC900\uC77C'}</span>
+              <input className="settings-row-input" type="date" style={{width:145}}
+                value={settings.startDate} onChange={e => update('startDate', e.target.value)} />
+            </div>
+            <div className="settings-row">
+              <span className="settings-row-label">Day {dayNumber} — {isA ? 'A (\uC870\uAE45)' : 'B (\uB9E8\uBAAC)'}</span>
+              <div className="toggle-wrap">
+                <span style={{fontSize:12,color:'var(--sub)'}}>{'\uC218\uB3D9 \uC804\uD658'}</span>
+                <button className={`toggle${settings.manualDayOverride ? ' on' : ''}`}
+                  onClick={() => update('manualDayOverride', !settings.manualDayOverride)}>
+                  <div className="toggle-knob" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Alarms */}
+          <div className="settings-card">
+            <div className="settings-card-title">{'\u23F0'} {'\uC54C\uB78C'}</div>
+            <div style={{fontSize:11,color:'var(--sub2)',marginBottom:12,cursor:'pointer',textDecoration:'underline'}}
+              onClick={requestNotif}>{'\uC54C\uB9BC \uAD8C\uD55C \uD5C8\uC6A9\uD558\uAE30'}</div>
+            {alarmList.map(a => {
+              const alarm = settings.alarms[a.key] || {};
+              return (
+                <div className="alarm-row" key={a.key}>
+                  <div className="alarm-info">
+                    <div className="alarm-name">{a.label}</div>
+                  </div>
+                  <input className="alarm-time-input" type="time"
+                    value={alarm.time || '09:00'}
+                    onChange={e => updateAlarm(a.key, 'time', e.target.value)} />
+                  <button className={`toggle${alarm.on ? ' on' : ''}`}
+                    onClick={() => updateAlarm(a.key, 'on', !alarm.on)}>
+                    <div className="toggle-knob" />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Reset */}
+          <div className="settings-card" style={{background:'transparent',padding:0}}>
+            <button className="settings-reset-btn" onClick={handleReset}>
+              {'\uB370\uC774\uD130 \uCD08\uAE30\uD654'}
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    /* ─── App ─── */
+    const TABS = [
+      { id: 'home', label: '홈', icon: Icons.home, component: HomePage },
+      { id: 'running', label: '러닝', icon: Icons.running, component: RunningPage },
+      { id: 'workout', label: '운동', icon: Icons.fitness, component: WorkoutPage },
+      { id: 'diet', label: '식단', icon: Icons.diet, component: DietPage },
+      { id: 'settings', label: '설정', icon: Icons.settings, component: SettingsPage },
+    ];
+
+    function App() {
+      const [activeTab, setActiveTab] = useState('home');
+
+      const today = new Date();
+      const dateStr = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일`;
+      const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+      const fullDate = `${dateStr} ${weekdays[today.getDay()]}요일`;
+
+      const ActivePage = useMemo(() => {
+        return TABS.find((t) => t.id === activeTab)?.component || HomePage;
+      }, [activeTab]);
+
+      return (
+        <>
+          <div className="header">
+            <div className="header-title">71키로의 여정</div>
+            <div className="header-date">{fullDate}</div>
+          </div>
+
+          <div className="content">
+            <ActivePage />
+          </div>
+
+          <nav className="bottom-nav">
+            {TABS.map((tab) => (
+              <button
+                key={tab.id}
+                className={`nav-item${activeTab === tab.id ? ' active' : ''}`}
+                onClick={() => setActiveTab(tab.id)}
+              >
+                <span className="nav-icon">{tab.icon}</span>
+                {tab.label}
+              </button>
+            ))}
+          </nav>
+        </>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+  <script>
+    // Service Worker registration + alarm bridge
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/diet/sw.js').then(function(reg) {
+        console.log('SW registered');
+      }).catch(function(err) {
+        console.log('SW failed:', err);
+      });
+      // Listen for alarm settings request from SW
+      navigator.serviceWorker.addEventListener('message', function(e) {
+        if (e.data && e.data.type === 'GET_ALARMS') {
+          try {
+            var s = JSON.parse(localStorage.getItem('diet-settings'));
+            if (s && s.alarms && navigator.serviceWorker.controller) {
+              navigator.serviceWorker.controller.postMessage({ type: 'ALARM_SETTINGS', alarms: s.alarms });
+            }
+          } catch(err) {}
+        }
+      });
+    }
+  </script>
+</body>
+</html>
