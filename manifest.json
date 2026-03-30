@@ -4,8 +4,8 @@
   "description": "다큰왕자 다이어트 루틴 앱",
   "start_url": "/diet/index.html",
   "display": "standalone",
-  "background_color": "#1a1a2e",
-  "theme_color": "#4CAF50",
+  "background_color": "#FAFAFA",
+  "theme_color": "#E85D3A",
   "orientation": "portrait",
   "icons": [
     {
