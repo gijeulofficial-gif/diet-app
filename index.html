@@ -1742,18 +1742,18 @@
     /* ─── Shared meal data (lunch & dinner) ─── */
     const LUNCH_ITEMS = [
       { id: 'l-1', text: '\uACE0\uAD6C\uB9C8 1\uAC1C', dietId: 'dl-1' },
-      { id: 'l-2', text: '\uC0B6\uC740 \uB2EC\uAC78 3\uAC1C', dietId: 'dl-2' },
+      { id: 'l-2', text: '\uC0B6\uC740 \uB2EC\uAC78 2\uAC1C', dietId: 'dl-2' },
       { id: 'l-3', text: '\uADF8\uB9AD\uC694\uAC70\uD2B8 + \uBE14\uB8E8\uBCA0\uB9AC', dietId: 'dl-3' },
-      { id: 'l-4', text: '\uACAC\uACFC\uB958 10\uC54C \uC774\uB0B4', dietId: 'dl-5' },
-      { id: 'l-5', text: '\uB450\uBD80 \uBC18\uBAA8', dietId: 'dl-6' },
-      { id: 'l-6', text: '\uB2ED\uAC00\uC2B4\uC0B4 150g', dietId: 'dl-7' },
+      { id: 'l-4', text: '\uACAC\uACFC\uB958 10\uC54C', dietId: 'dl-5' },
+      { id: 'l-5', text: '\uB2ED\uAC00\uC2B4\uC0B4 50g', dietId: 'dl-6' },
     ];
     const DINNER_ITEMS = [
-      { id: 'd-1', text: '\uBAA9\uC0B4 or \uB2ED\uAC00\uC2B4\uC0B4 250g', dietId: 'dd-1' },
+      { id: 'd-1', text: '\uC0BC\uAC81\uC0B4 200g', dietId: 'dd-1' },
       { id: 'd-2', text: '\uC591\uBC30\uCD94 100g', dietId: 'dd-2' },
       { id: 'd-3', text: '\uACE0\uAD6C\uB9C8 2\uAC1C', dietId: 'dd-3' },
-      { id: 'd-4', text: '\uC0B6\uC740 \uB2EC\uAC78 2\uAC1C', dietId: 'dd-4' },
-      { id: 'd-5', text: '\uC2DD\uD6C4 \uC0B0\uCC45 20~30\uBD84' },
+      { id: 'd-4', text: '\uC0B6\uC740 \uB2EC\uAC78 3\uAC1C', dietId: 'dd-4' },
+      { id: 'd-5', text: '\uB450\uBD80 \uBC18\uBAA8', dietId: 'dd-5' },
+      { id: 'd-6', text: '\uC2DD\uD6C4 \uC0B0\uCC45 20~30\uBD84' },
     ];
 
     /* ─── Routine Data ─── */
@@ -2101,12 +2101,10 @@
     function getDietMealChecked() {
       const diet = loadDiet();
       const ck = diet.checked || {};
-      const meatType = diet.meatType || 'mok';
-      const dinnerKey = meatType === 'dak' ? 'dinner_dak' : 'dinner_mok';
       // Check if ALL default items in a section are checked
       const allChecked = (section, defaults) => defaults.every(f => ck[section + '-' + f.id]);
       const lunchDone = allChecked('lunch', DEFAULT_MEALS.lunch);
-      const dinnerDone = allChecked('dinner', DEFAULT_MEALS[dinnerKey]);
+      const dinnerDone = allChecked('dinner', DEFAULT_MEALS.dinner);
       const snackDone = !!ck['snack-ds-1'];
       // Calc totals from checked items only
       let totalKcal = 0, totalProt = 0;
@@ -2120,7 +2118,7 @@
         });
       };
       addSection('lunch', DEFAULT_MEALS.lunch);
-      addSection('dinner', DEFAULT_MEALS[dinnerKey]);
+      addSection('dinner', DEFAULT_MEALS.dinner);
       addSection('snack', DEFAULT_MEALS.snack);
       // Collect checked extras for display on home
       const getExtras = (section) => ((diet.extras || {})[section] || []).filter(f => ck[section + '-' + f.id]);
@@ -3293,27 +3291,22 @@
     const DEFAULT_MEALS = {
       lunch: [
         { id: 'dl-1', name: '\uACE0\uAD6C\uB9C8 1\uAC1C', kcal: 130, protein: 2 },
-        { id: 'dl-2', name: '\uC0B6\uC740 \uB2EC\uAC78 3\uAC1C', kcal: 240, protein: 21 },
+        { id: 'dl-2', name: '\uC0B6\uC740 \uB2EC\uAC78 2\uAC1C', kcal: 160, protein: 14 },
         { id: 'dl-3', name: '\uADF8\uB9AD\uC694\uAC70\uD2B8 1\uCEF5', kcal: 130, protein: 15 },
         { id: 'dl-4', name: '\uBE14\uB8E8\uBCA0\uB9AC \uD55C\uC904', kcal: 40, protein: 0.5 },
         { id: 'dl-5', name: '\uACAC\uACFC\uB958 10\uC54C', kcal: 90, protein: 3 },
-        { id: 'dl-6', name: '\uB450\uBD80 \uBC18\uBAA8', kcal: 120, protein: 12 },
-        { id: 'dl-7', name: '\uB2ED\uAC00\uC2B4\uC0B4 150g', kcal: 165, protein: 34.5 },
+        { id: 'dl-6', name: '\uB2ED\uAC00\uC2B4\uC0B4 50g', kcal: 55, protein: 11.5 },
       ],
-      dinner_mok: [
-        { id: 'dd-1', name: '\uBAA9\uC0B4 250g', kcal: 575, protein: 45 },
+      dinner: [
+        { id: 'dd-1', name: '\uC0BC\uAC81\uC0B4 200g', kcal: 560, protein: 28 },
         { id: 'dd-2', name: '\uC591\uBC30\uCD94 100g', kcal: 25, protein: 1.5 },
         { id: 'dd-3', name: '\uACE0\uAD6C\uB9C8 2\uAC1C', kcal: 260, protein: 4 },
-        { id: 'dd-4', name: '\uC0B6\uC740 \uB2EC\uAC78 2\uAC1C', kcal: 160, protein: 14 },
-      ],
-      dinner_dak: [
-        { id: 'dd-1', name: '\uB2ED\uAC00\uC2B4\uC0B4 250g', kcal: 275, protein: 57.5 },
-        { id: 'dd-2', name: '\uC591\uBC30\uCD94 100g', kcal: 25, protein: 1.5 },
-        { id: 'dd-3', name: '\uACE0\uAD6C\uB9C8 2\uAC1C', kcal: 260, protein: 4 },
-        { id: 'dd-4', name: '\uC0B6\uC740 \uB2EC\uAC78 2\uAC1C', kcal: 160, protein: 14 },
+        { id: 'dd-4', name: '\uC0B6\uC740 \uB2EC\uAC78 3\uAC1C', kcal: 240, protein: 21 },
+        { id: 'dd-5', name: '\uB450\uBD80 \uBC18\uBAA8', kcal: 120, protein: 12 },
       ],
       snack: [
-        { id: 'ds-1', name: '\uBC14\uB098\uB098 1\uAC1C (\uC6B4\uB3D9 \uC804)', kcal: 93, protein: 1 },
+        { id: 'ds-1', name: '\uBC14\uB098\uB098 1\uAC1C', kcal: 93, protein: 1 },
+        { id: 'ds-2', name: '\uADF8\uB9AD\uC694\uAC70\uD2B8 1\uCEF5', kcal: 130, protein: 15 },
       ],
     };
     const MEAL_SECTIONS = [
@@ -3370,7 +3363,6 @@
 
     function DietPage() {
       const [dietData, setDietData] = useState(loadDiet);
-      const [meatType, setMeatType] = useState(() => dietData.meatType || 'mok'); // mok | dak
       const [modal, setModal] = useState(null);
       const [selected, setSelected] = useState(null);
       const [search, setSearch] = useState('');
@@ -3379,12 +3371,9 @@
       const checked = dietData.checked || {};
       const extras = dietData.extras || { lunch: [], dinner: [], snack: [] };
 
-      const dinnerKey = meatType === 'dak' ? 'dinner_dak' : 'dinner_mok';
-
       // All items per section (defaults + extras)
       const getItems = (sectionKey) => {
-        const defaultKey = sectionKey === 'dinner' ? dinnerKey : sectionKey;
-        const defaults = (DEFAULT_MEALS[defaultKey] || []).map(f => ({ ...f, isDefault: true }));
+        const defaults = (DEFAULT_MEALS[sectionKey] || []).map(f => ({ ...f, isDefault: true }));
         const extra = (extras[sectionKey] || []).map(f => ({ ...f, isDefault: false }));
         return [...defaults, ...extra];
       };
@@ -3417,15 +3406,6 @@
           const key = sectionKey + '-' + foodId;
           ck[key] = !ck[key];
           const next = { ...prev, checked: ck };
-          saveDiet(next);
-          return next;
-        });
-      }, []);
-
-      const switchMeat = useCallback((type) => {
-        setMeatType(type);
-        setDietData(prev => {
-          const next = { ...prev, meatType: type };
           saveDiet(next);
           return next;
         });
@@ -3531,24 +3511,6 @@
                   </div>
                   <button className="meal-add-btn" onClick={() => openModal(sec.key)}>+</button>
                 </div>
-
-                {/* Dinner meat switcher */}
-                {sec.key === 'dinner' && (
-                  <div style={{display:'flex',gap:8,marginBottom:12}}>
-                    <button onClick={() => switchMeat('mok')} style={{
-                      flex:1, padding:'8px 0', border:'1px solid', borderRadius:8, cursor:'pointer',
-                      borderColor: meatType==='mok' ? 'var(--primary)' : 'var(--check-unchecked)',
-                      background: meatType==='mok' ? 'var(--primary-bg)' : 'transparent',
-                      color: meatType==='mok' ? 'var(--primary)' : 'var(--sub2)', fontSize:13, fontWeight:600,
-                    }}>{'\uBAA9\uC0B4'}</button>
-                    <button onClick={() => switchMeat('dak')} style={{
-                      flex:1, padding:'8px 0', border:'1px solid', borderRadius:8, cursor:'pointer',
-                      borderColor: meatType==='dak' ? 'var(--primary)' : 'var(--check-unchecked)',
-                      background: meatType==='dak' ? 'var(--primary-bg)' : 'transparent',
-                      color: meatType==='dak' ? 'var(--primary)' : 'var(--sub2)', fontSize:13, fontWeight:600,
-                    }}>{'\uB2ED\uAC00\uC2B4\uC0B4'}</button>
-                  </div>
-                )}
 
                 {items.map(f => {
                   const fid = f.id || f.name;

@@ -2,7 +2,7 @@
   "name": "71키로의 여정",
   "short_name": "71kg",
   "description": "다큰왕자 다이어트 루틴 앱",
-  "start_url": "/diet/index.html",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#FAFAFA",
   "theme_color": "#E85D3A",
