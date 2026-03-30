@@ -1,5 +1,5 @@
 const CACHE_NAME = 'diet-v1';
-const ASSETS = ['/diet/index.html', '/diet/manifest.json', '/diet/icon-512.png'];
+const ASSETS = ['./index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 // Install
 self.addEventListener('install', (e) => {
