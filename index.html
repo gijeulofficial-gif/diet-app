@@ -533,8 +533,8 @@
     .alarm-info { flex: 1; }
     .alarm-name { font-size: 14px; color: var(--text); }
     .alarm-time-input {
-      width: 80px;
-      padding: 6px 8px;
+      width: 110px;
+      padding: 8px 10px;
       background: var(--input-bg);
       border: 1px solid var(--input-border);
       border-radius: 6px;
@@ -1544,6 +1544,55 @@
       margin-top: 4px;
     }
 
+    /* Cheer message */
+    .cheer-card {
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cheer-card.full {
+      background: linear-gradient(135deg, var(--primary), #ff7043);
+      color: #fff;
+    }
+    .cheer-card.half {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .cheer-text {
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.5;
+      position: relative;
+      z-index: 1;
+    }
+    .cheer-sub {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-top: 4px;
+      position: relative;
+      z-index: 1;
+    }
+    @keyframes confetti-fall {
+      0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(80px) rotate(360deg); opacity: 0; }
+    }
+    .confetti-wrap {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .confetti {
+      position: absolute;
+      top: -8px;
+      font-size: 14px;
+      animation: confetti-fall 2.5s ease-in infinite;
+    }
+
     /* Page title */
     .page-title {
       font-size: 24px;
@@ -2050,25 +2099,20 @@
       const mondayOffset = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
       const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - mondayOffset);
 
-      let totalKcalDays = 0, totalKcal = 0, workoutCount = 0, totalRunKm = 0;
+      let workoutCount = 0, totalRunKm = 0;
       const weightValues = [];
+      const weekDays = ['\uC6D4','\uD654','\uC218','\uBAA9','\uAE08','\uD1A0','\uC77C'];
+      const dailyPct = []; // { label, pct, future }
 
       for (let i = 0; i < 7; i++) {
         const d = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);
-        if (d > now) break;
+        const isFuture = d > now;
         const ds = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
 
-        // Diet calories
-        try {
-          const diet = JSON.parse(localStorage.getItem(`diet-v2-${ds}`));
-          if (diet && diet.checked) {
-            let dayKcal = 0;
-            Object.keys(diet.checked).forEach(k => {
-              if (!diet.checked[k]) return;
-              // We can't easily recalc from keys alone, so skip detailed calc
-            });
-          }
-        } catch {}
+        // Daily peak achievement (saved by HomePage)
+        const peakKey = `diet-peak-${ds}`;
+        const pct = isFuture ? -1 : (parseInt(localStorage.getItem(peakKey)) || 0);
+        dailyPct.push({ label: weekDays[i], pct, date: `${d.getMonth()+1}/${d.getDate()}` });
 
         // Workout
         try {
@@ -2093,8 +2137,10 @@
       const wtStart = weightValues.length > 0 ? weightValues[0] : null;
       const wtEnd = weightValues.length > 0 ? weightValues[weightValues.length - 1] : null;
       const wtChange = wtStart !== null && wtEnd !== null ? (wtEnd - wtStart).toFixed(1) : null;
+      const avgPct = dailyPct.filter(d => d.pct >= 0);
+      const weekAvgPct = avgPct.length > 0 ? Math.round(avgPct.reduce((s, d) => s + d.pct, 0) / avgPct.length) : 0;
 
-      return { workoutCount, totalRunKm: Math.round(totalRunKm * 100) / 100, wtStart, wtEnd, wtChange };
+      return { workoutCount, totalRunKm: Math.round(totalRunKm * 100) / 100, wtStart, wtEnd, wtChange, dailyPct, weekAvgPct };
     }
 
     /* ─── Diet-Home sync helpers ─── */
@@ -2105,7 +2151,7 @@
       const allChecked = (section, defaults) => defaults.every(f => ck[section + '-' + f.id]);
       const lunchDone = allChecked('lunch', DEFAULT_MEALS.lunch);
       const dinnerDone = allChecked('dinner', DEFAULT_MEALS.dinner);
-      const snackDone = !!ck['snack-ds-1'];
+      const snackDone = allChecked('snack', DEFAULT_MEALS[getSnackKey()]);
       // Calc totals from checked items only
       let totalKcal = 0, totalProt = 0;
       const addSection = (section, defaults) => {
@@ -2119,7 +2165,7 @@
       };
       addSection('lunch', DEFAULT_MEALS.lunch);
       addSection('dinner', DEFAULT_MEALS.dinner);
-      addSection('snack', DEFAULT_MEALS.snack);
+      addSection('snack', DEFAULT_MEALS[getSnackKey()]);
       // Collect checked extras for display on home
       const getExtras = (section) => ((diet.extras || {})[section] || []).filter(f => ck[section + '-' + f.id]);
       const extras = {
@@ -2201,6 +2247,38 @@
       // Weekly report
       const weekly = useMemo(() => getWeeklyReport(), []);
 
+      // Cheer message
+      const CHEER_FULL = [
+        '\uC644\uBCBD\uD55C \uD558\uB8E8! 67kg\uC774 \uB2E4\uAC00\uC624\uACE0 \uC788\uC2B5\uB2C8\uB2E4 \uD83D\uDD25',
+        '\uC624\uB298\uB3C4 \uD574\uB0C8\uC2B5\uB2C8\uB2E4! \uC774 \uD750\uB984 \uADF8\uB300\uB85C \uD83D\uDCAA',
+        '\uB300\uB2E8\uD569\uB2C8\uB2E4! \uB0B4\uC77C\uB3C4 \uC774 \uAE30\uC138\uB85C \uD83C\uDFC3',
+        '100% \uB2EC\uC131! \uBAB8\uC774 \uBC14\uB00C\uACE0 \uC788\uC2B5\uB2C8\uB2E4 \uD83C\uDFAF',
+        '\uC624\uB298\uC758 \uB098\uB294 \uC5B4\uC81C\uC758 \uB098\uBCF4\uB2E4 \uAC15\uD569\uB2C8\uB2E4 \u26A1',
+      ];
+      const cheerMsg = useMemo(() => CHEER_FULL[Math.floor(Math.random() * CHEER_FULL.length)], []);
+
+      const calcOverallPct = () => {
+        let done = 0, total = 0;
+        routine.forEach(meal => {
+          meal.items.forEach(item => {
+            total++;
+            if (isItemChecked(meal.slot, item)) done++;
+          });
+        });
+        return total > 0 ? Math.round((done / total) * 100) : 0;
+      };
+      const overallPct = calcOverallPct();
+
+      // Save peak daily achievement to localStorage
+      useEffect(() => {
+        const d = new Date();
+        const key = `diet-peak-${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+        const prev = parseInt(localStorage.getItem(key)) || 0;
+        if (overallPct > prev) {
+          localStorage.setItem(key, String(overallPct));
+        }
+      }, [overallPct]);
+
       const handleWtChange = useCallback((e) => {
         const v = parseFloat(e.target.value);
         setTodayWt(e.target.value);
@@ -2257,6 +2335,22 @@
 
       return (
         <div>
+          {overallPct >= 100 && (
+            <div className="cheer-card full">
+              <div className="confetti-wrap">
+                {['\uD83C\uDF89','\u2B50','\uD83D\uDD25','\uD83C\uDF8A','\u26A1','\uD83C\uDFC6','\uD83D\uDCAA'].map((e,i) => (
+                  <span key={i} className="confetti" style={{left:`${10+i*13}%`,animationDelay:`${i*0.3}s`,animationDuration:`${2+i*0.2}s`}}>{e}</span>
+                ))}
+              </div>
+              <div className="cheer-text">{cheerMsg}</div>
+              <div className="cheer-sub">100% \uB2EC\uC131 \uC644\uB8CC!</div>
+            </div>
+          )}
+          {overallPct >= 50 && overallPct < 100 && (
+            <div className="cheer-card half">
+              <div className="cheer-text" style={{fontSize:14}}>{'\uC808\uBC18 \uC774\uC0C1 \uC644\uB8CC! \uB098\uBA38\uC9C0\uB3C4 \uD574\uBD05\uC2DC\uB2E4'} {'\uD83D\uDC4A'}</div>
+            </div>
+          )}
           <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:12,flexWrap:'wrap'}}>
             <div className="achieve-ring">
               <svg width="80" height="80" viewBox="0 0 80 80">
@@ -2326,6 +2420,31 @@
           {/* Weekly Report */}
           <div className="weekly-card">
             <div className="weekly-title">{'\uD83D\uDCCA'} {'\uC774\uBC88 \uC8FC \uC694\uC57D'}</div>
+
+            {/* Daily achievement bars */}
+            <div style={{display:'flex',alignItems:'flex-end',gap:6,marginBottom:16,height:80}}>
+              {weekly.dailyPct.map((d, i) => {
+                const isFuture = d.pct < 0;
+                const h = isFuture ? 4 : Math.max(4, (d.pct / 100) * 70);
+                const color = isFuture ? 'var(--border)' : d.pct >= 100 ? 'var(--success)' : d.pct >= 50 ? 'var(--primary)' : 'var(--sub2)';
+                const isToday = i === (new Date().getDay() === 0 ? 6 : new Date().getDay() - 1);
+                return (
+                  <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4}}>
+                    {!isFuture && d.pct > 0 && <div style={{fontSize:9,color:'var(--sub)',fontWeight:600}}>{d.pct}%</div>}
+                    <div style={{
+                      width:'100%',height:h,borderRadius:4,background:color,
+                      transition:'height 0.3s',
+                      boxShadow: isToday ? `0 0 0 2px ${color}` : 'none',
+                    }} />
+                    <div style={{fontSize:10,color: isToday ? 'var(--primary)' : 'var(--sub2)',fontWeight: isToday ? 700 : 400}}>{d.label}</div>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{textAlign:'center',fontSize:13,color:'var(--sub)',marginBottom:16}}>
+              {'\uC8FC\uAC04 \uD3C9\uADE0 \uB2EC\uC131\uB960'} <span style={{color:'var(--primary)',fontWeight:700}}>{weekly.weekAvgPct}%</span>
+            </div>
+
             <div className="weekly-grid">
               <div className="weekly-item">
                 <div className="weekly-value">{weekly.workoutCount}{'\uD68C'}</div>
@@ -3304,11 +3423,15 @@
         { id: 'dd-4', name: '\uC0B6\uC740 \uB2EC\uAC78 3\uAC1C', kcal: 240, protein: 21 },
         { id: 'dd-5', name: '\uB450\uBD80 \uBC18\uBAA8', kcal: 120, protein: 12 },
       ],
-      snack: [
+      snack_a: [
         { id: 'ds-1', name: '\uBC14\uB098\uB098 1\uAC1C', kcal: 93, protein: 1 },
         { id: 'ds-2', name: '\uADF8\uB9AD\uC694\uAC70\uD2B8 1\uCEF5', kcal: 130, protein: 15 },
       ],
+      snack_b: [
+        { id: 'ds-1', name: '\uBC14\uB098\uB098 1\uAC1C', kcal: 93, protein: 1 },
+      ],
     };
+    function getSnackKey() { return getDayInfo().isA ? 'snack_a' : 'snack_b'; }
     const MEAL_SECTIONS = [
       { key: 'lunch', label: '\uC810\uC2EC', icon: '\u2600\uFE0F' },
       { key: 'dinner', label: '\uC800\uB141', icon: '\uD83C\uDF19' },
@@ -3373,7 +3496,8 @@
 
       // All items per section (defaults + extras)
       const getItems = (sectionKey) => {
-        const defaults = (DEFAULT_MEALS[sectionKey] || []).map(f => ({ ...f, isDefault: true }));
+        const defaultKey = sectionKey === 'snack' ? getSnackKey() : sectionKey;
+        const defaults = (DEFAULT_MEALS[defaultKey] || []).map(f => ({ ...f, isDefault: true }));
         const extra = (extras[sectionKey] || []).map(f => ({ ...f, isDefault: false }));
         return [...defaults, ...extra];
       };
@@ -3778,6 +3902,9 @@
                 <div className="alarm-row" key={a.key}>
                   <div className="alarm-info">
                     <div className="alarm-name">{a.label}</div>
+                    <div style={{fontSize:11,color:'var(--sub2)',marginTop:2}}>
+                      {alarm.on ? (alarm.time || '09:00') + ' \uC54C\uB9BC' : '\uAEBC\uC838 \uC788\uC74C'}
+                    </div>
                   </div>
                   <input className="alarm-time-input" type="time"
                     value={alarm.time || '09:00'}
@@ -3852,25 +3979,50 @@
     ReactDOM.createRoot(document.getElementById('root')).render(<App />);
   </script>
   <script>
-    // Service Worker registration + alarm bridge
+    // Service Worker registration (PWA cache only)
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/diet/sw.js').then(function(reg) {
-        console.log('SW registered');
-      }).catch(function(err) {
-        console.log('SW failed:', err);
-      });
-      // Listen for alarm settings request from SW
-      navigator.serviceWorker.addEventListener('message', function(e) {
-        if (e.data && e.data.type === 'GET_ALARMS') {
-          try {
-            var s = JSON.parse(localStorage.getItem('diet-settings'));
-            if (s && s.alarms && navigator.serviceWorker.controller) {
-              navigator.serviceWorker.controller.postMessage({ type: 'ALARM_SETTINGS', alarms: s.alarms });
-            }
-          } catch(err) {}
-        }
-      });
+      navigator.serviceWorker.register('/diet/sw.js').catch(function(){});
     }
+
+    // Foreground alarm system — checks every 30 seconds
+    (function() {
+      var ALARM_MSGS = {
+        workout: '운동 준비 시간입니다! 물 한 잔 + 바나나 먹고 시작하세요 💪',
+        lunch: '점심 식사 시간입니다! 식단 체크 잊지 마세요 🍚',
+        dinner: '저녁 식사 시간입니다! 식후 산책도 잊지 마세요 🚶',
+        walk: '저녁 산책 시간입니다! 20~30분 가볍게 걸어보세요 🌙'
+      };
+      var sentKey = 'diet-alarm-sent-' + new Date().toDateString();
+
+      function checkAlarms() {
+        try {
+          var s = JSON.parse(localStorage.getItem('diet-settings'));
+          if (!s || !s.alarms) return;
+          var now = new Date();
+          var hh = String(now.getHours()).padStart(2, '0');
+          var mm = String(now.getMinutes()).padStart(2, '0');
+          var currentTime = hh + ':' + mm;
+          var sent = JSON.parse(localStorage.getItem(sentKey) || '{}');
+
+          Object.keys(s.alarms).forEach(function(key) {
+            var alarm = s.alarms[key];
+            if (alarm.on && alarm.time === currentTime && !sent[key]) {
+              sent[key] = true;
+              localStorage.setItem(sentKey, JSON.stringify(sent));
+              var msg = ALARM_MSGS[key] || '알림';
+              if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('71키로의 여정', { body: msg });
+              } else {
+                alert(msg);
+              }
+            }
+          });
+        } catch(e) {}
+      }
+
+      setInterval(checkAlarms, 30000);
+      checkAlarms();
+    })();
   </script>
 </body>
 </html>

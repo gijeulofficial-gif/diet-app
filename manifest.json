@@ -1,18 +1,20 @@
 {
   "name": "71키로의 여정",
-  "short_name": "71kg",
-  "description": "다큰왕자 다이어트 루틴 앱",
-  "start_url": "./",
+  "short_name": "DietRun",
+  "start_url": "/diet-app/",
   "display": "standalone",
-  "background_color": "#FAFAFA",
+  "background_color": "#E85D3A",
   "theme_color": "#E85D3A",
-  "orientation": "portrait",
   "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ]
 }
