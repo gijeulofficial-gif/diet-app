@@ -1730,23 +1730,30 @@
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const diff = Math.floor((today - start) / (1000 * 60 * 60 * 24));
       const elapsed = diff < 0 ? 0 : diff;
-      const isA = elapsed % 2 === 0; // Day 0 = A
+      let isA = elapsed % 2 === 0; // Day 0 = A
+      // Manual override: flip A/B
+      try {
+        const s = JSON.parse(localStorage.getItem('diet-settings'));
+        if (s && s.manualDayOverride) isA = !isA;
+      } catch {}
       return { dayType: isA ? 'A' : 'B', isA, dayNumber: elapsed + 1 };
     }
 
     /* ─── Shared meal data (lunch & dinner) ─── */
     const LUNCH_ITEMS = [
-      { id: 'l-1', text: '\uACE0\uAD6C\uB9C8 1\uAC1C' },
-      { id: 'l-2', text: '\uC0B6\uC740 \uB2EC\uAC78 3\uAC1C' },
-      { id: 'l-3', text: '\uADF8\uB9AD\uC694\uAC70\uD2B8 + \uBE14\uB8E8\uBCA0\uB9AC' },
-      { id: 'l-4', text: '\uACAC\uACFC\uB958 10\uC54C \uC774\uB0B4' },
-      { id: 'l-5', text: '\uB450\uBD80 \uBC18\uBAA8' },
+      { id: 'l-1', text: '\uACE0\uAD6C\uB9C8 1\uAC1C', dietId: 'dl-1' },
+      { id: 'l-2', text: '\uC0B6\uC740 \uB2EC\uAC78 3\uAC1C', dietId: 'dl-2' },
+      { id: 'l-3', text: '\uADF8\uB9AD\uC694\uAC70\uD2B8 + \uBE14\uB8E8\uBCA0\uB9AC', dietId: 'dl-3' },
+      { id: 'l-4', text: '\uACAC\uACFC\uB958 10\uC54C \uC774\uB0B4', dietId: 'dl-5' },
+      { id: 'l-5', text: '\uB450\uBD80 \uBC18\uBAA8', dietId: 'dl-6' },
+      { id: 'l-6', text: '\uB2ED\uAC00\uC2B4\uC0B4 150g', dietId: 'dl-7' },
     ];
     const DINNER_ITEMS = [
-      { id: 'd-1', text: '\uBAA9\uC0B4 or \uB2ED\uAC00\uC2B4\uC0B4 200g' },
-      { id: 'd-2', text: '\uCC44\uC18C (\uBE0C\uB85C\uCF5C\uB9AC, \uC591\uBC30\uCD94 \uB4F1)' },
-      { id: 'd-3', text: '\uACE0\uAD6C\uB9C8 1\uAC1C or \uBC14\uB098\uB098 1\uAC1C' },
-      { id: 'd-4', text: '\uC2DD\uD6C4 \uC0B0\uCC45 20~30\uBD84' },
+      { id: 'd-1', text: '\uBAA9\uC0B4 or \uB2ED\uAC00\uC2B4\uC0B4 250g', dietId: 'dd-1' },
+      { id: 'd-2', text: '\uC591\uBC30\uCD94 100g', dietId: 'dd-2' },
+      { id: 'd-3', text: '\uACE0\uAD6C\uB9C8 2\uAC1C', dietId: 'dd-3' },
+      { id: 'd-4', text: '\uC0B6\uC740 \uB2EC\uAC78 2\uAC1C', dietId: 'dd-4' },
+      { id: 'd-5', text: '\uC2DD\uD6C4 \uC0B0\uCC45 20~30\uBD84' },
     ];
 
     /* ─── Routine Data ─── */
@@ -2122,7 +2129,7 @@
         dinner: getExtras('dinner'),
         snack: getExtras('snack'),
       };
-      return { lunchDone, dinnerDone, snackDone, totalKcal: Math.round(totalKcal), totalProt: Math.round(totalProt * 10) / 10, extras };
+      return { lunchDone, dinnerDone, snackDone, totalKcal: Math.round(totalKcal), totalProt: Math.round(totalProt * 10) / 10, extras, _raw: ck };
     }
 
     function HomePage() {
@@ -2148,15 +2155,34 @@
         });
       }, []);
 
-      // Determine if a home item is checked (diet-synced or manual)
-      const isItemChecked = (mealSlot, itemId) => {
-        // Lunch items: synced from diet
-        if (mealSlot === 'lunch') return dietSync.lunchDone;
-        // Dinner: d-4 (산책) is manual, d-1~d-3 synced from diet
-        if (mealSlot === 'dinner' && itemId === 'd-4') return !!checks[itemId];
-        if (mealSlot === 'dinner') return dietSync.dinnerDone;
-        // Morning items: manual checks
-        return !!checks[itemId];
+      // Per-item diet check status from diet localStorage
+      const isDietItemChecked = useCallback((sectionKey, dietId) => {
+        if (!dietId) return false;
+        const ck = (dietSync._raw || {});
+        return !!ck[sectionKey + '-' + dietId];
+      }, [dietSync]);
+
+      // Toggle a diet item from home (writes to diet localStorage)
+      const toggleDietItem = useCallback((sectionKey, dietId) => {
+        if (!dietId) return;
+        const diet = loadDiet();
+        const ck = { ...(diet.checked || {}) };
+        const key = sectionKey + '-' + dietId;
+        ck[key] = !ck[key];
+        diet.checked = ck;
+        saveDiet(diet);
+        setDietSync(getDietMealChecked());
+      }, []);
+
+      // Determine if a home item is checked
+      const isItemChecked = (mealSlot, item) => {
+        // Items with dietId → check from diet data
+        if (item.dietId) {
+          const sec = mealSlot === 'lunch' ? 'lunch' : 'dinner';
+          return isDietItemChecked(sec, item.dietId);
+        }
+        // Manual items (산책, morning routines)
+        return !!checks[item.id];
       };
 
       // Weight tracking
@@ -2346,12 +2372,7 @@
 
           <div className="timeline" style={{marginTop: isA ? 16 : 0}}>
             {routine.map((meal) => {
-              const done = meal.items.filter((it) => {
-                if (meal.slot === 'lunch') return dietSync.lunchDone;
-                if (meal.slot === 'dinner' && it.id === 'd-4') return !!checks[it.id];
-                if (meal.slot === 'dinner') return dietSync.dinnerDone;
-                return !!checks[it.id];
-              }).length;
+              const done = meal.items.filter((it) => isItemChecked(meal.slot, it)).length;
               const total = meal.items.length;
               const pct = Math.round((done / total) * 100);
               return (
@@ -2359,23 +2380,25 @@
                   <div className="timeline-time">{meal.icon} {meal.label} {meal.time}</div>
                   <ul className="checklist">
                     {meal.items.map((item) => {
-                      const itemChecked = isItemChecked(meal.slot, item.id);
-                      const isMealSync = (meal.slot === 'lunch') || (meal.slot === 'dinner' && item.id !== 'd-4');
+                      const itemChecked = isItemChecked(meal.slot, item);
+                      const hasDietId = !!item.dietId;
                       return (
                         <li key={item.id}>
                           <div
                             className={`check-item${itemChecked ? ' checked' : ''}`}
                             onClick={() => {
-                              if (isMealSync) return; // synced from diet tab, not manually togglable
-                              toggle(item.id);
+                              if (hasDietId) {
+                                const sec = meal.slot === 'lunch' ? 'lunch' : 'dinner';
+                                toggleDietItem(sec, item.dietId);
+                              } else {
+                                toggle(item.id);
+                              }
                             }}
-                            style={isMealSync ? {cursor:'default'} : {}}
                           >
                             <span className="check-box">{checkIcon}</span>
                             <span>
                               <span className="check-text">{item.text}</span>
                               {item.sub && <div className="check-sub">{item.sub}</div>}
-                              {isMealSync && !itemChecked && <div className="check-sub">{'\uC2DD\uB2E8 \uD0ED\uC5D0\uC11C \uCCB4\uD06C'}</div>}
                             </span>
                           </div>
                           {item.accordion && <WorkoutAccordion accordionKey={item.accordion} />}
@@ -3275,16 +3298,19 @@
         { id: 'dl-4', name: '\uBE14\uB8E8\uBCA0\uB9AC \uD55C\uC904', kcal: 40, protein: 0.5 },
         { id: 'dl-5', name: '\uACAC\uACFC\uB958 10\uC54C', kcal: 90, protein: 3 },
         { id: 'dl-6', name: '\uB450\uBD80 \uBC18\uBAA8', kcal: 120, protein: 12 },
+        { id: 'dl-7', name: '\uB2ED\uAC00\uC2B4\uC0B4 150g', kcal: 165, protein: 34.5 },
       ],
       dinner_mok: [
-        { id: 'dd-1', name: '\uBAA9\uC0B4 200g', kcal: 460, protein: 36 },
+        { id: 'dd-1', name: '\uBAA9\uC0B4 250g', kcal: 575, protein: 45 },
         { id: 'dd-2', name: '\uC591\uBC30\uCD94 100g', kcal: 25, protein: 1.5 },
-        { id: 'dd-3', name: '\uACE0\uAD6C\uB9C8 1\uAC1C', kcal: 130, protein: 2 },
+        { id: 'dd-3', name: '\uACE0\uAD6C\uB9C8 2\uAC1C', kcal: 260, protein: 4 },
+        { id: 'dd-4', name: '\uC0B6\uC740 \uB2EC\uAC78 2\uAC1C', kcal: 160, protein: 14 },
       ],
       dinner_dak: [
-        { id: 'dd-1', name: '\uB2ED\uAC00\uC2B4\uC0B4 200g', kcal: 220, protein: 46 },
+        { id: 'dd-1', name: '\uB2ED\uAC00\uC2B4\uC0B4 250g', kcal: 275, protein: 57.5 },
         { id: 'dd-2', name: '\uC591\uBC30\uCD94 100g', kcal: 25, protein: 1.5 },
-        { id: 'dd-3', name: '\uACE0\uAD6C\uB9C8 1\uAC1C', kcal: 130, protein: 2 },
+        { id: 'dd-3', name: '\uACE0\uAD6C\uB9C8 2\uAC1C', kcal: 260, protein: 4 },
+        { id: 'dd-4', name: '\uC0B6\uC740 \uB2EC\uAC78 2\uAC1C', kcal: 160, protein: 14 },
       ],
       snack: [
         { id: 'ds-1', name: '\uBC14\uB098\uB098 1\uAC1C (\uC6B4\uB3D9 \uC804)', kcal: 93, protein: 1 },
