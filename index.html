@@ -1780,12 +1780,48 @@
       const diff = Math.floor((today - start) / (1000 * 60 * 60 * 24));
       const elapsed = diff < 0 ? 0 : diff;
       let isA = elapsed % 2 === 0; // Day 0 = A
-      // Manual override: flip A/B
       try {
         const s = JSON.parse(localStorage.getItem('diet-settings'));
         if (s && s.manualDayOverride) isA = !isA;
       } catch {}
-      return { dayType: isA ? 'A' : 'B', isA, dayNumber: elapsed + 1 };
+      const week = Math.floor(elapsed / 7) + 1;
+      return { dayType: isA ? 'A' : 'B', isA, dayNumber: elapsed + 1, week };
+    }
+
+    /* ─── Weekly intensity config ─── */
+    function getIntensity(week) {
+      const w = week || 1;
+      if (w <= 2) return {
+        runMin: 6, runMax: 8, runMsg: '6~8km \uBAA9\uD45C',
+        exWork: 40, exRest: 20, rounds: 3,
+        reps: 12, sets: 3, dbMsg: '',
+        plankSec: 60, plankSets: 3,
+        level: 1, label: '\uAE30\uCD08',
+      };
+      if (w <= 4) return {
+        runMin: 8, runMax: 9, runMsg: '8~9km \uBAA9\uD45C',
+        exWork: 45, exRest: 20, rounds: 3,
+        reps: 15, sets: 3, dbMsg: '',
+        plankSec: 75, plankSets: 3,
+        level: 2, label: '\uC131\uC7A5',
+        change: '\uC6B4\uB3D9 40\uCD08\u219245\uCD08 | \uC544\uB839 12\uD68C\u219215\uD68C | \uD50C\uB7AD\uD06C 60\uCD08\u219275\uCD08',
+      };
+      if (w <= 6) return {
+        runMin: 9, runMax: 10, runMsg: '9~10km \uBAA9\uD45C',
+        exWork: 45, exRest: 20, rounds: 4,
+        reps: 15, sets: 3, dbMsg: '\uBB34\uAC8C\uB97C \uC62C\uB824\uBCF4\uC138\uC694 \uD83D\uDCAA',
+        plankSec: 90, plankSets: 3,
+        level: 3, label: '\uAC15\uD654',
+        change: '\uB77C\uC6B4\uB4DC 3\u21924 | \uD50C\uB7AD\uD06C 75\uCD08\u219290\uCD08 | \uBB34\uAC8C UP',
+      };
+      return {
+        runMin: 10, runMax: 12, runMsg: '10km+ \uD398\uC774\uC2A4\uB97C \uC62C\uB824\uBCF4\uC138\uC694',
+        exWork: 45, exRest: 15, rounds: 4,
+        reps: 12, sets: 4, dbMsg: '\uBB34\uAC8C \uC62C\uB9B0 \uC0C1\uD0DC \uC720\uC9C0',
+        plankSec: 90, plankSets: 3,
+        level: 4, label: '\uB9C8\uC2A4\uD130',
+        change: '\uD734\uC2DD 20\uCD08\u219215\uCD08 | \uC544\uB839 3\uC138\uD2B8\u21924\uC138\uD2B8\xD712\uD68C',
+      };
     }
 
     /* ─── Shared meal data (lunch & dinner) ─── */
@@ -2179,9 +2215,10 @@
     function HomePage() {
       const [checks, setChecks] = useState(loadChecks);
       const [dietSync, setDietSync] = useState(getDietMealChecked);
-      const { dayType, isA, dayNumber } = getDayInfo();
+      const { dayType, isA, dayNumber, week } = getDayInfo();
       const routine = ROUTINES[dayType];
       const cardClass = isA ? '' : ' day-b';
+      const intensity = getIntensity(week);
 
       // Re-sync diet data periodically (when tab becomes visible)
       useEffect(() => {
@@ -2379,14 +2416,27 @@
               </div>
             </div>
           </div>
-          <div style={{display:'flex',alignItems:'center',gap:16,marginBottom:8}}>
+          <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:4,flexWrap:'wrap'}}>
             <div className="day-counter" style={{marginBottom:0}}>Day {dayNumber}</div>
+            <div style={{fontSize:12,color:'var(--energy)',fontWeight:600,background:'var(--energy-bg)',padding:'2px 8px',borderRadius:6}}>
+              {week}{'\uC8FC\uCC28'} | {intensity.label}
+            </div>
             {dietSync.totalKcal > 0 && (
-              <div style={{fontSize:13,color:'var(--primary)',fontWeight:600}}>
+              <div style={{fontSize:12,color:'var(--primary)',fontWeight:600}}>
                 {'\uD83D\uDD25'} {dietSync.totalKcal.toLocaleString()}kcal | {'\uD83E\uDD69'} {dietSync.totalProt}g
               </div>
             )}
           </div>
+          {isA && (
+            <div style={{fontSize:12,color:'var(--sub)',marginBottom:8}}>
+              {'\uD83C\uDFC3'} {'\uC624\uB298 \uBAA9\uD45C: '}{intensity.runMsg}
+            </div>
+          )}
+          {!isA && intensity.change && (
+            <div style={{fontSize:11,color:'var(--energy)',marginBottom:8}}>
+              {'\u26A1'} {intensity.change}
+            </div>
+          )}
 
           {/* Weight tracker */}
           <div className="wt-section">
@@ -3013,7 +3063,8 @@
 
     /* ─── WorkoutPage ─── */
     function WorkoutPage() {
-      const { isA } = getDayInfo();
+      const { isA, week } = getDayInfo();
+      const inten = getIntensity(week);
       const [woHistory] = useState(() => loadWorkoutHistory());
       const [phase, setPhase] = useState('idle');
       // idle | interval | intervalRest | roundRest | rest5min | dumbbell | dumbbellRest | plank | plankRest | done
@@ -3060,24 +3111,20 @@
       }, [stopTick]);
 
       const advanceInterval = useCallback((r, e) => {
+        const maxRounds = inten.rounds;
         if (e < 4) {
-          // exercise phase
           setPhase('interval'); setRound(r); setExIdx(e);
-          startCountdown(40, () => {
-            // rest 20s then next exercise
+          startCountdown(inten.exWork, () => {
             setPhase('intervalRest');
-            startCountdown(20, () => advanceInterval(r, e + 1));
+            startCountdown(inten.exRest, () => advanceInterval(r, e + 1));
           });
         } else {
-          // last exercise in round (index 4)
           setPhase('interval'); setRound(r); setExIdx(e);
-          startCountdown(40, () => {
-            if (r < 2) {
-              // round rest 60s
+          startCountdown(inten.exWork, () => {
+            if (r < maxRounds - 1) {
               setPhase('roundRest');
               startCountdown(60, () => advanceInterval(r + 1, 0));
             } else {
-              // interval done → 5min rest
               playBeepDone();
               setPhase('rest5min');
               startCountdown(300, () => {
@@ -3102,7 +3149,7 @@
       const handleDbSetDone = useCallback(() => {
         const ex = DUMBBELL_EXERCISES[dbIdx];
         const nextSet = dbSet + 1;
-        if (nextSet >= ex.sets) {
+        if (nextSet >= inten.sets) {
           // next exercise
           const nextEx = dbIdx + 1;
           if (nextEx >= DUMBBELL_EXERCISES.length) {
@@ -3140,8 +3187,8 @@
       const startPlankSequence = useCallback((setNum) => {
         setPlankSet(setNum);
         setPhase('plank');
-        startCountdown(PLANK_DURATION, () => {
-          if (setNum + 1 < PLANK_SETS) {
+        startCountdown(inten.plankSec, () => {
+          if (setNum + 1 < inten.plankSets) {
             setPhase('plankRest');
             startCountdown(PLANK_REST, () => startPlankSequence(setNum + 1));
           } else {
@@ -3159,7 +3206,7 @@
       const handleSetComplete = useCallback(() => {
         const ex = DUMBBELL_EXERCISES[dbIdx];
         const nextSet = dbSet + 1;
-        if (nextSet >= ex.sets) {
+        if (nextSet >= inten.sets) {
           const nextEx = dbIdx + 1;
           if (nextEx >= DUMBBELL_EXERCISES.length) {
             handleDbAllDone();
@@ -3275,8 +3322,19 @@
       if (phase === 'idle') {
         return (
           <div className="wo-wrap">
-            <div className="page-title" style={{marginBottom:8}}>{'\uD83D\uDCAA'} {'\uB9E8\uBAAC \uC778\uD130\uBC8C'}</div>
-            <div className="page-subtitle" style={{marginBottom:32}}>{'\uC624\uB298\uC758 B\uC77C \uC6B4\uB3D9\uC744 \uC2DC\uC791\uD558\uC138\uC694'}</div>
+            <div className="page-title" style={{marginBottom:4}}>{'\uD83D\uDCAA'} {'\uB9E8\uBAAC \uC778\uD130\uBC8C'}</div>
+            <div style={{fontSize:13,color:'var(--energy)',fontWeight:600,marginBottom:4}}>
+              {week}{'\uC8FC\uCC28'} | {inten.label} {'\uB808\uBCA8'}
+            </div>
+            <div style={{fontSize:12,color:'var(--sub)',marginBottom:6,textAlign:'center',lineHeight:1.6}}>
+              {'\uC6B4\uB3D9'} {inten.exWork}{'\uCD08'} / {'\uD734\uC2DD'} {inten.exRest}{'\uCD08'} / {inten.rounds}{'\uB77C\uC6B4\uB4DC'}<br/>
+              {'\uC544\uB839'} {inten.reps}{'\uD68C'} \u00D7 {inten.sets}{'\uC138\uD2B8'} | {'\uD50C\uB7AD\uD06C'} {inten.plankSec}{'\uCD08'} \u00D7 {inten.plankSets}{'\uC138\uD2B8'}
+            </div>
+            {inten.change && (
+              <div style={{fontSize:11,color:'var(--energy)',marginBottom:16,background:'var(--energy-bg)',padding:'6px 12px',borderRadius:8}}>
+                {'\u26A1 \uB808\uBCA8\uC5C5!'} {inten.change}
+              </div>
+            )}
             <button className="wo-btn wo-btn-start pulse" onClick={handleStart}>START</button>
             <div style={{width:'100%',marginTop:16}}>{woHistorySection}</div>
           </div>
@@ -3286,15 +3344,18 @@
       // Dumbbell phase
       if (phase === 'dumbbell' || phase === 'dumbbellRest') {
         const ex = DUMBBELL_EXERCISES[dbIdx];
+        const dbReps = inten.reps;
+        const dbSets = inten.sets;
         return (
           <div className="wo-wrap wo-rest">
             <div className="wo-phase-label">{'\uC544\uB839 \uC6B4\uB3D9'} {dbIdx + 1}/{DUMBBELL_EXERCISES.length}</div>
+            {inten.dbMsg && <div style={{fontSize:12,color:'var(--energy)',marginBottom:8}}>{inten.dbMsg}</div>}
             <div className="wo-set-card">
               <div className="wo-set-title">{ex.name}</div>
-              <div className="wo-set-subtitle">{ex.target} | {ex.sets}{'\uC138\uD2B8'} x {ex.reps}{'\uD68C'}</div>
+              <div className="wo-set-subtitle">{ex.target} | {dbSets}{'\uC138\uD2B8'} x {dbReps}{'\uD68C'}</div>
               {ex.desc && <div className="wo-exercise-desc" style={{textAlign:'left',margin:'0 0 12px',maxWidth:'100%'}}>{ex.desc}</div>}
               <div className="wo-set-progress">
-                {Array.from({length: ex.sets}, (_, i) => (
+                {Array.from({length: dbSets}, (_, i) => (
                   <div key={i} className={`wo-set-dot${i < dbSet ? ' done' : i === dbSet ? ' current' : ''}`}>
                     {i < dbSet ? '\u2713' : i + 1}
                   </div>
@@ -3304,7 +3365,7 @@
                 <div className="wo-set-rest">{'\uD734\uC2DD'} {timer}{'\uCD08'}</div>
               ) : (
                 <button className="wo-set-btn" onClick={handleSetComplete}>
-                  {dbSet + 1}{'\uC138\uD2B8 \uC644\uB8CC'} ({ex.reps}{'\uD68C'})
+                  {dbSet + 1}{'\uC138\uD2B8 \uC644\uB8CC'} ({dbReps}{'\uD68C'})
                 </button>
               )}
             </div>
@@ -3317,10 +3378,10 @@
         return (
           <div className={`wo-wrap ${phase === 'plank' ? 'wo-exercise' : 'wo-rest'}`}>
             <div className="wo-phase-label">{'\uD50C\uB7AD\uD06C \uB9C8\uBB34\uB9AC'}</div>
-            <div className="wo-round">{'\uC138\uD2B8'} {plankSet + 1}/{PLANK_SETS}</div>
+            <div className="wo-round">{'\uC138\uD2B8'} {plankSet + 1}/{inten.plankSets}</div>
             <CircularTimer
               seconds={timer}
-              total={phase === 'plank' ? PLANK_DURATION : PLANK_REST}
+              total={phase === 'plank' ? inten.plankSec : PLANK_REST}
               color={phase === 'plank' ? 'var(--danger)' : 'var(--blue)'}
             />
             <div className="wo-timer-status" style={{fontSize:16,fontWeight:700,color: phase==='plank'?'var(--danger)':'var(--blue)'}}>
@@ -3349,7 +3410,7 @@
       const ex = INTERVAL_EXERCISES[exIdx] || INTERVAL_EXERCISES[0];
       const isExercise = phase === 'interval';
       const isRoundRest = phase === 'roundRest';
-      const timerTotal = isExercise ? 40 : isRoundRest ? 60 : 20;
+      const timerTotal = isExercise ? inten.exWork : isRoundRest ? 60 : inten.exRest;
       const timerColor = isExercise ? 'var(--danger)' : 'var(--blue)';
       const bgClass = isExercise ? 'wo-exercise' : 'wo-rest';
       const nextEx = isExercise && exIdx < 4 ? INTERVAL_EXERCISES[exIdx + 1] : null;
@@ -3357,7 +3418,7 @@
       return (
         <div className={`wo-wrap ${bgClass}`}>
           <div className="wo-phase-label">{'\uB9E8\uBAAC \uC778\uD130\uBC8C'}</div>
-          <div className="wo-round">{'\uB77C\uC6B4\uB4DC'} {round + 1}/3</div>
+          <div className="wo-round">{'\uB77C\uC6B4\uB4DC'} {round + 1}/{inten.rounds}</div>
 
           <div className="round-lanes" style={{width:'100%'}}>
             {[0,1,2].map(i => (
